@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +8,36 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // you can later add real auth logic here
-    navigate("/dashboard"); // redirect to dashboard
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Login failed");
+        return;
+      }
+
+      // Save user + token
+      localStorage.setItem("user", JSON.stringify(data));
+
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError("Server not responding");
+    }
   };
 
   return (
@@ -18,17 +46,33 @@ export default function Login() {
         <CardContent className="p-6 space-y-4">
           <h2 className="text-2xl font-bold text-center text-foreground">Login</h2>
 
+          {error && (
+            <p className="text-red-500 text-center text-sm">{error}</p>
+          )}
+
           <div className="space-y-1">
             <Label>Email</Label>
-            <Input type="email" placeholder="name@seecs.edu.pk" className="bg-background"/>
+            <Input
+              type="email"
+              placeholder="name@seecs.edu.pk"
+              className="bg-background"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
 
           <div className="space-y-1">
             <Label>Password</Label>
-            <Input type="password" placeholder="••••••••" className="bg-background"/>
+            <Input
+              type="password"
+              placeholder="••••••••"
+              className="bg-background"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
 
-          <Button 
+          <Button
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={handleLogin}
           >
