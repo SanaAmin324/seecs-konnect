@@ -3,13 +3,15 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/Notfound";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/notfound" element={<NotFound />} />
 
         {/* Protect Dashboard */}
         <Route
@@ -20,6 +22,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/ui" element={<Dashboard />} />
+
       </Routes>
     </BrowserRouter>
   );
