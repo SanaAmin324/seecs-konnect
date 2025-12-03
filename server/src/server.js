@@ -18,6 +18,8 @@ app.use(express.json());
 
 // Routes
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/documents", require("./routes/documentRoutes"));
+
 
 // Test route
 app.get("/", (req, res) => res.send("SEECS Konnect Backend Running"));
