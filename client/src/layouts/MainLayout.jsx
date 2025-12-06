@@ -6,17 +6,15 @@ export default function MainLayout({ children }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background text-foreground overflow-hidden">
-        
         {/* Sidebar */}
+        <div className="hidden md:flex"></div>
         <AppSidebar />
 
         {/* Main content */}
-        <div className="flex flex-col flex-1 min-h-screen w-full">
-          <Navbar />
-
-          <main className="flex-1 p-6 md:p-8 w-full">
-            {children}
-          </main>
+        <div className="flex-1 flex flex-col">
+          <Navbar
+          />
+          <main className="flex-1 p-4 md:p-8">{children}</main>
         </div>
       </div>
     </SidebarProvider>

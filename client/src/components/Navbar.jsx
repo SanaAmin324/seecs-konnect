@@ -1,18 +1,22 @@
-import { Sun, Moon, Bell, LogOut } from "lucide-react";
+import { Sun, Moon, Bell, LogOut, Menu } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function Navbar() {
   const { logout } = useAuth();
-
+  const { theme, toggleTheme } = useTheme();
   return (
     <nav className="w-full flex items-center justify-between px-6 py-3 bg-sidebar backdrop-blur-sm border-b-2 border-sidebar-border">
       {/* Left side: Search bar */}
+      <div className="md:hidden">
+        <SidebarTrigger className="p-2 rounded-full hover:bg-primary/10" />
+      </div>
+
       <div className="flex-1 min-w-0">
         <div className="flex w-full max-w-2xl bg-card rounded-xl shadow-sm overflow-hidden border border-border">
-          
-
           {/* Search input */}
           <input
             type="text"
@@ -52,7 +56,7 @@ export default function Navbar() {
           <Button
             variant="default"
             size="sm"
-            className="rounded-r-xl px-4 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
+            className="rounded-r-xl px-4 h-10 bg-primary text-primary-foreground hover:bg-primary/90"
             title="Execute Search"
           >
             Search
@@ -64,10 +68,15 @@ export default function Navbar() {
       <div className="flex items-center gap-2 ml-6">
         <Button
           variant="ghost"
-          className="rounded-full p-2 hover:bg-primary/20"
+          className="rounded-full p-2 hover:bg-primary/10"
+          onClick={toggleTheme}
           title="Toggle Theme"
         >
-          <Sun className="w-5 h-5 text-foreground" />
+          {theme === "light" ? (
+            <Moon className="w-5 h-5 text-primary" />
+          ) : (
+            <Sun className="w-5 h-5 text-primary" />
+          )}
         </Button>
         <Button
           variant="ghost"

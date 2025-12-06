@@ -4,16 +4,18 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/Notfound";
+import Documents from "./pages/Documents";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        {/* Public routes */}
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notfound" element={<NotFound />} />
 
-        {/* Protect Dashboard */}
+        {/* Protected routes */}
         <Route
           path="/dashboard"
           element={
@@ -22,8 +24,18 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/ui" element={<Dashboard />} />
 
+        <Route
+          path="/documents"
+          element={
+            <ProtectedRoute>
+              <Documents />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
