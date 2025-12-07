@@ -3,48 +3,59 @@ const User = require("../models/User");
 const fs = require("fs");
 const path = require("path");
 
-// Upload document
+// Upload document (multiple files)
 const uploadDocument = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "File is required" });
+    if (!req.files || req.files.length === 0)
+      return res.status(400).json({ message: "At least one file is required" });
 
-    const { title, description, course, program } = req.body;
+    const { title, description, course, class: className, academicYear, category } = req.body;
 
-    // Validate required fields
     if (!title || !course) {
       return res.status(400).json({ message: "Title and course are required" });
     }
 
+    // Prepare files array for schema
+    const filesArray = req.files.map((file) => ({
+      filePath: file.path,
+      originalName: file.originalname,
+      fileType: path.extname(file.originalname).substring(1),
+    }));
+
     const newDoc = new Document({
       title,
       description: description || "",
-      filePath: req.file.path,
-      fileType: path.extname(req.file.originalname).substring(1),
       course,
-      program: program || "",
+      class: className || "",
+      academicYear: academicYear || "",
+      category: category || "",
       uploader: req.user._id,
+      files: filesArray,
     });
 
     await newDoc.save();
-    res.status(201).json({ message: "Document uploaded successfully", document: newDoc });
+
+    res.status(201).json({
+      message: "Document uploaded successfully",
+      document: newDoc,
+    });
   } catch (err) {
     console.error("Upload error:", err);
     res.status(500).json({ message: "Failed to upload document" });
   }
 };
 
-// Fetch all documents (or per user)
-// Fetch all documents (or per user) with pagination
+// Get documents (pagination)
 const getDocuments = async (req, res) => {
-  const { user, page = 1, limit = 10 } = req.query; // default page=1, limit=10
+  const { user, page = 1, limit = 10 } = req.query;
   const filter = user ? { uploader: user } : {};
+  const skip = (page - 1) * limit;
 
-  const skip = (page - 1) * limit; // calculate how many to skip
-  const totalDocs = await Document.countDocuments(filter); // total matching documents
+  const totalDocs = await Document.countDocuments(filter);
 
   const documents = await Document.find(filter)
     .populate("uploader", "name email program batch")
-    .sort({ createdAt: -1 }) // newest first
+    .sort({ createdAt: -1 })
     .skip(parseInt(skip))
     .limit(parseInt(limit));
 
@@ -57,66 +68,68 @@ const getDocuments = async (req, res) => {
   });
 };
 
-
-// Download document
+// Download a specific file from the document
 const downloadDocument = async (req, res) => {
   try {
-    const doc = await Document.findById(req.params.id);
+    const { id, fileIndex } = req.params; // fileIndex = which file to download
+    const doc = await Document.findById(id);
+
     if (!doc) return res.status(404).json({ message: "Document not found" });
 
-    if (!fs.existsSync(doc.filePath)) {
+    const file = doc.files[fileIndex];
+    if (!file) return res.status(404).json({ message: "Requested file not found" });
+
+    if (!fs.existsSync(file.filePath)) {
       return res.status(404).json({ message: "File not found on server" });
     }
 
-    res.download(path.resolve(doc.filePath), doc.title + path.extname(doc.filePath));
+    return res.download(
+      path.resolve(file.filePath),
+      file.originalName
+    );
   } catch (err) {
     console.error("Download error:", err);
-    res.status(500).json({ message: "Failed to download document" });
+    res.status(500).json({ message: "Failed to download file" });
   }
 };
 
-// Delete document
+// Delete document + all files
 const deleteDocument = async (req, res) => {
   try {
     const doc = await Document.findById(req.params.id);
     if (!doc) return res.status(404).json({ message: "Document not found" });
 
-    // Only uploader or admin can delete
     if (doc.uploader.toString() !== req.user._id.toString() && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized to delete this document" });
+      return res.status(403).json({ message: "Not authorized" });
     }
 
-    // Remove file from storage if exists
-    try {
-      if (fs.existsSync(doc.filePath)) {
-        await fs.promises.unlink(doc.filePath);
-      } else {
-        console.warn(`File ${doc.filePath} not found, skipping unlink`);
+    // Delete all file paths
+    for (const file of doc.files) {
+      if (fs.existsSync(file.filePath)) {
+        await fs.promises.unlink(file.filePath);
       }
-    } catch (err) {
-      console.error("Error deleting file:", err);
-      return res.status(500).json({ message: "Failed to delete file from storage" });
     }
 
     await doc.remove();
-    res.json({ message: "Document deleted successfully" });
+    res.json({ message: "Document and all files deleted successfully" });
   } catch (err) {
-    console.error("Delete document error:", err);
+    console.error("Delete error:", err);
     res.status(500).json({ message: "Failed to delete document" });
   }
 };
 
 // Search documents
-// Search documents with pagination
 const searchDocuments = async (req, res) => {
-  const { title, course, program, uploaderName, fileType, page = 1, limit = 10 } = req.query;
+  const { title, course, category, className, academicYear, uploaderName, page = 1, limit = 10 } =
+    req.query;
 
   const query = {};
 
   if (title) query.title = { $regex: title, $options: "i" };
   if (course) query.course = { $regex: course, $options: "i" };
-  if (program) query.program = { $regex: program, $options: "i" };
-  if (fileType) query.fileType = { $regex: fileType, $options: "i" };
+  if (category) query.category = { $regex: category, $options: "i" };
+  if (className) query.class = { $regex: className, $options: "i" };
+  if (academicYear) query.academicYear = { $regex: academicYear, $options: "i" };
 
   const skip = (page - 1) * limit;
 
@@ -126,7 +139,6 @@ const searchDocuments = async (req, res) => {
     .skip(parseInt(skip))
     .limit(parseInt(limit));
 
-  // filter by uploader name if provided
   if (uploaderName) {
     documents = documents.filter((doc) =>
       doc.uploader.name.toLowerCase().includes(uploaderName.toLowerCase())
@@ -134,6 +146,7 @@ const searchDocuments = async (req, res) => {
   }
 
   const totalDocs = await Document.countDocuments(query);
+
   res.json({
     documents,
     page: parseInt(page),

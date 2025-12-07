@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
+
 const {
   uploadDocument,
   getDocuments,
@@ -10,16 +11,16 @@ const {
   searchDocuments,
 } = require("../controllers/documentController");
 
-// Upload (protected)
-router.post("/upload", protect, upload.single("file"), uploadDocument);
+// Upload multiple files → "files" is the field name
+router.post("/upload", protect, upload.array("files", 10), uploadDocument);
 
-// Fetch documents (protected)
+// Get documents
 router.get("/", protect, getDocuments);
 
-// Download
-router.get("/download/:id", protect, downloadDocument);
+// Download one specific file in a document
+router.get("/download/:id/:fileIndex", protect, downloadDocument);
 
-// Delete
+// Delete document + all files
 router.delete("/:id", protect, deleteDocument);
 
 // Search

@@ -19,6 +19,11 @@ app.use(express.json());
 // Routes
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/documents", require("./routes/documentRoutes"));
+app.use('/api/forum', require('./routes/forumRoutes'));
+app.use("/api/notifications", require("./routes/notificationRoutes"));
+
+
+
 
 
 // Test route

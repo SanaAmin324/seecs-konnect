@@ -4,7 +4,7 @@ const path = require("path");
 // File storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/"); // store files in server/uploads folder
+    cb(null, "uploads/"); 
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -12,13 +12,13 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter for allowed types
+// Allowed file types
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     "image/jpeg",
     "image/png",
     "image/gif",
@@ -26,11 +26,8 @@ const fileFilter = (req, file, cb) => {
     "application/x-zip-compressed",
   ];
 
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("File type not allowed"), false);
-  }
+  if (allowedTypes.includes(file.mimetype)) cb(null, true);
+  else cb(new Error("File type not allowed"), false);
 };
 
 const upload = multer({ storage, fileFilter });
