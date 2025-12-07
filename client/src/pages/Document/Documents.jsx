@@ -1,11 +1,33 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Upload, Star, Clock, TrendingUp, FileText, Search, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  BookOpen,
+  Upload,
+  Star,
+  Clock,
+  TrendingUp,
+  FileText,
+  Search,
+  Filter,
+} from "lucide-react";
 import { useState } from "react";
-import MainLayout from "../layouts/Mainlayout";
+import MainLayout from "../../layouts/Mainlayout";
 
 const Documents = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,9 +179,15 @@ const Documents = () => {
       <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-muted/10 to-background">
         {/* Decorative floating elements */}
         <div className="fixed top-10 right-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl animate-float pointer-events-none" />
-        <div className="fixed bottom-20 left-40 w-64 h-64 bg-secondary/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: "1s" }} />
-        <div className="fixed top-1/2 right-1/3 w-56 h-56 bg-accent/5 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: "2s" }} />
-    
+        <div
+          className="fixed bottom-20 left-40 w-64 h-64 bg-secondary/5 rounded-full blur-3xl animate-float pointer-events-none"
+          style={{ animationDelay: "1s" }}
+        />
+        <div
+          className="fixed top-1/2 right-1/3 w-56 h-56 bg-accent/5 rounded-full blur-3xl animate-float pointer-events-none"
+          style={{ animationDelay: "2s" }}
+        />
+
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto px-6 py-8 max-w-7xl">
             {/* Header */}
@@ -168,12 +196,17 @@ const Documents = () => {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
                   Resources Library 📚
                 </h1>
-                <p className="text-muted-foreground">Your cozy space for study materials</p>
+                <p className="text-muted-foreground">
+                  Your cozy space for study materials
+                </p>
               </div>
             </div>
 
             {/* Search and Filters */}
-            <Card className="card-soft mb-8 border-2 border-border/50 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <Card
+              className="card-soft mb-8 border-2 border-border/50 animate-fade-in"
+              style={{ animationDelay: "0.1s" }}
+            >
               <CardContent className="p-6 space-y-4">
                 {/* Search Bar */}
                 <div className="relative">
@@ -191,19 +224,30 @@ const Documents = () => {
                 <div className="flex items-center gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-muted-foreground">Filters:</span>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Filters:
+                    </span>
                   </div>
-                  
-                  <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+
+                  <Select
+                    value={selectedCourse}
+                    onValueChange={setSelectedCourse}
+                  >
                     <SelectTrigger className="w-[180px] rounded-2xl border-2 border-border/50">
                       <SelectValue placeholder="Course" />
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl">
                       <SelectItem value="all">All Courses</SelectItem>
-                      <SelectItem value="cs201">CS201 - Data Structures</SelectItem>
+                      <SelectItem value="cs201">
+                        CS201 - Data Structures
+                      </SelectItem>
                       <SelectItem value="cs301">CS301 - Databases</SelectItem>
-                      <SelectItem value="cs202">CS202 - Operating Systems</SelectItem>
-                      <SelectItem value="se301">SE301 - Software Eng</SelectItem>
+                      <SelectItem value="cs202">
+                        CS202 - Operating Systems
+                      </SelectItem>
+                      <SelectItem value="se301">
+                        SE301 - Software Eng
+                      </SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -221,7 +265,10 @@ const Documents = () => {
                     </SelectContent>
                   </Select>
 
-                  <Select value={selectedInstructor} onValueChange={setSelectedInstructor}>
+                  <Select
+                    value={selectedInstructor}
+                    onValueChange={setSelectedInstructor}
+                  >
                     <SelectTrigger className="w-[180px] rounded-2xl border-2 border-border/50">
                       <SelectValue placeholder="Instructor" />
                     </SelectTrigger>
@@ -234,9 +281,11 @@ const Documents = () => {
                     </SelectContent>
                   </Select>
 
-                  {(selectedCourse !== "all" || selectedType !== "all" || selectedInstructor !== "all") && (
-                    <Button 
-                      variant="ghost" 
+                  {(selectedCourse !== "all" ||
+                    selectedType !== "all" ||
+                    selectedInstructor !== "all") && (
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => {
                         setSelectedCourse("all");
@@ -253,23 +302,32 @@ const Documents = () => {
             </Card>
 
             {/* Continue Reading Section */}
-            <div className="mb-10 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <div
+              className="mb-10 animate-fade-in"
+              style={{ animationDelay: "0.2s" }}
+            >
               <div className="flex items-center gap-2 mb-4">
                 <Clock className="w-6 h-6 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Continue Reading 📖</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Continue Reading 📖
+                </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {continueReading.map((doc, idx) => (
-                  <Card 
-                    key={doc.id} 
+                  <Card
+                    key={doc.id}
                     className="card-soft hover-lift cursor-pointer border-2 border-border/50 overflow-hidden animate-scale-in"
                     style={{ animationDelay: `${idx * 0.1}s` }}
                   >
                     <div className="bg-gradient-to-br from-primary/20 via-accent/15 to-secondary/10 p-8 text-center">
-                      <div className="text-6xl mb-2 animate-bounce-soft">{doc.thumbnail}</div>
+                      <div className="text-6xl mb-2 animate-bounce-soft">
+                        {doc.thumbnail}
+                      </div>
                     </div>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-lg hover:text-primary transition-colors">{doc.title}</CardTitle>
+                      <CardTitle className="text-lg hover:text-primary transition-colors">
+                        {doc.title}
+                      </CardTitle>
                       <CardDescription className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge className="rounded-full bg-primary/20 text-primary-foreground border border-primary/30 text-xs">
@@ -279,19 +337,25 @@ const Documents = () => {
                             {doc.type}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2">{doc.instructor}</p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {doc.instructor}
+                        </p>
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm text-muted-foreground">
                           <span>Progress</span>
-                          <span className="font-medium">{doc.currentPage}/{doc.pages} pages</span>
+                          <span className="font-medium">
+                            {doc.currentPage}/{doc.pages} pages
+                          </span>
                         </div>
                         <div className="w-full bg-muted/50 rounded-full h-2">
-                          <div 
+                          <div
                             className="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all"
-                            style={{ width: `${(doc.currentPage / doc.pages) * 100}%` }}
+                            style={{
+                              width: `${(doc.currentPage / doc.pages) * 100}%`,
+                            }}
                           />
                         </div>
                       </div>
@@ -302,26 +366,35 @@ const Documents = () => {
             </div>
 
             {/* Starred Documents */}
-            <div className="mb-10 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <div
+              className="mb-10 animate-fade-in"
+              style={{ animationDelay: "0.3s" }}
+            >
               <div className="flex items-center gap-2 mb-4">
                 <Star className="w-6 h-6 text-primary fill-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Starred Documents ⭐</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Starred Documents ⭐
+                </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {starredDocs.map((doc, idx) => (
-                  <Card 
-                    key={doc.id} 
+                  <Card
+                    key={doc.id}
                     className="card-soft hover-lift cursor-pointer border-2 border-primary/30 overflow-hidden animate-scale-in"
                     style={{ animationDelay: `${idx * 0.1}s` }}
                   >
                     <div className="bg-gradient-to-br from-accent/20 via-primary/15 to-secondary/10 p-8 text-center relative">
-                      <div className="text-6xl mb-2 animate-wiggle">{doc.thumbnail}</div>
+                      <div className="text-6xl mb-2 animate-wiggle">
+                        {doc.thumbnail}
+                      </div>
                       <div className="absolute top-3 right-3">
                         <Star className="w-6 h-6 text-primary fill-primary animate-bounce-soft" />
                       </div>
                     </div>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-lg hover:text-primary transition-colors">{doc.title}</CardTitle>
+                      <CardTitle className="text-lg hover:text-primary transition-colors">
+                        {doc.title}
+                      </CardTitle>
                       <CardDescription className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge className="rounded-full bg-primary/20 text-primary-foreground border border-primary/30 text-xs">
@@ -331,12 +404,16 @@ const Documents = () => {
                             {doc.type}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2">{doc.instructor}</p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {doc.instructor}
+                        </p>
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-muted-foreground">{doc.pages} pages</span>
+                        <span className="text-muted-foreground">
+                          {doc.pages} pages
+                        </span>
                         <div className="flex items-center gap-1 text-primary">
                           <span className="font-medium">{doc.likes}</span>
                           <span className="text-muted-foreground">likes</span>
@@ -349,23 +426,32 @@ const Documents = () => {
             </div>
 
             {/* Popular Documents */}
-            <div className="mb-10 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            <div
+              className="mb-10 animate-fade-in"
+              style={{ animationDelay: "0.4s" }}
+            >
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-6 h-6 text-secondary" />
-                <h2 className="text-2xl font-bold text-foreground">Popular in Your Courses 🔥</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Popular in Your Courses 🔥
+                </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {popularDocs.map((doc, idx) => (
-                  <Card 
-                    key={doc.id} 
+                  <Card
+                    key={doc.id}
                     className="card-soft hover-lift cursor-pointer border-2 border-border/50 overflow-hidden animate-scale-in"
                     style={{ animationDelay: `${idx * 0.1}s` }}
                   >
                     <div className="bg-gradient-to-br from-secondary/20 via-accent/15 to-primary/10 p-6 text-center">
-                      <div className="text-5xl mb-2 animate-float">{doc.thumbnail}</div>
+                      <div className="text-5xl mb-2 animate-float">
+                        {doc.thumbnail}
+                      </div>
                     </div>
                     <CardHeader className="pb-2 px-4">
-                      <CardTitle className="text-base hover:text-primary transition-colors line-clamp-2">{doc.title}</CardTitle>
+                      <CardTitle className="text-base hover:text-primary transition-colors line-clamp-2">
+                        {doc.title}
+                      </CardTitle>
                       <CardDescription className="space-y-1">
                         <Badge className="rounded-full bg-secondary/20 text-secondary-foreground border border-secondary/30 text-xs">
                           {doc.course}
@@ -373,12 +459,20 @@ const Documents = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 pt-2 space-y-2">
-                      <p className="text-xs text-muted-foreground">{doc.instructor}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {doc.instructor}
+                      </p>
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-muted-foreground">{doc.pages} pages</span>
+                        <span className="text-muted-foreground">
+                          {doc.pages} pages
+                        </span>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-primary">❤️ {doc.likes}</span>
-                          <span className="font-medium text-secondary">⬇️ {doc.downloads}</span>
+                          <span className="font-medium text-primary">
+                            ❤️ {doc.likes}
+                          </span>
+                          <span className="font-medium text-secondary">
+                            ⬇️ {doc.downloads}
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -391,12 +485,14 @@ const Documents = () => {
             <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="w-6 h-6 text-accent" />
-                <h2 className="text-2xl font-bold text-foreground">Recently Uploaded 🆕</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Recently Uploaded 🆕
+                </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {recentUploads.map((doc, idx) => (
-                  <Card 
-                    key={doc.id} 
+                  <Card
+                    key={doc.id}
                     className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in"
                     style={{ animationDelay: `${idx * 0.1}s` }}
                   >
@@ -417,7 +513,9 @@ const Documents = () => {
                               {doc.type}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-1">{doc.instructor}</p>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            {doc.instructor}
+                          </p>
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span>Uploaded by {doc.uploadedBy}</span>
                             <span>{doc.timeAgo}</span>
@@ -431,35 +529,45 @@ const Documents = () => {
             </div>
 
             {/* Upload Prompt Card */}
-            <Card className="card-soft mt-10 border-2 border-dashed border-primary/40 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 animate-fade-in" style={{ animationDelay: "0.6s" }}>
+            <Card
+              className="card-soft mt-10 border-2 border-dashed border-primary/40 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 animate-fade-in"
+              style={{ animationDelay: "0.6s" }}
+            >
               <CardContent className="p-12 text-center">
                 <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center animate-bounce-soft">
                   <Upload className="w-12 h-12 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3">Share Your Knowledge! 🌟</h3>
+                <h3 className="text-2xl font-bold text-foreground mb-3">
+                  Share Your Knowledge! 🌟
+                </h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Help your fellow students by uploading your notes, study guides, or helpful resources
+                  Help your fellow students by uploading your notes, study
+                  guides, or helpful resources
                 </p>
-                <Button 
-                  size="lg"
-                  className="gap-2 rounded-3xl bg-gradient-to-r from-primary via-accent to-secondary hover:shadow-xl text-white hover-bounce px-10"
-                >
-                  <Upload className="w-5 h-5" />
-                  Upload Your First Document
-                </Button>
+                <Link to="/documents/upload">
+                  <Button
+                    size="lg"
+                    className="gap-2 rounded-3xl bg-linear-to-r from-primary via-accent to-secondary hover:shadow-xl text-white hover-bounce px-10"
+                  >
+                    <Upload className="w-5 h-5" />
+                    Upload Your First Document
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
         </main>
 
         {/* Floating Upload Button */}
-        <Button
-          size="lg"
-          className="fixed bottom-8 right-8 z-50 gap-2 rounded-full bg-gradient-to-r from-primary via-accent to-secondary hover:shadow-2xl text-white hover-bounce px-6 py-6 h-auto shadow-xl"
-        >
-          <Upload className="w-6 h-6" />
-          <span className="hidden md:inline">Upload Document</span>
-        </Button>
+        <Link to="/documents/upload">
+          <Button
+            size="lg"
+            className="fixed bottom-8 right-8 z-50 gap-2 rounded-full bg-gradient-to-r from-primary via-accent to-secondary hover:shadow-2xl text-white hover-bounce px-6 py-6 h-auto shadow-xl"
+          >
+            <Upload className="w-6 h-6" />
+            <span className="hidden md:inline">Upload Document</span>
+          </Button>
+        </Link>
       </div>
     </MainLayout>
   );

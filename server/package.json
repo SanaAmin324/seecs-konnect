@@ -15,8 +15,12 @@
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+<<<<<<< HEAD
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
+=======
+    "express": "^5.2.1",
+>>>>>>> 8dbdc2df164380f6b9763ae45f3729acd28e2dcb
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.0",
     "multer": "^2.0.2"
