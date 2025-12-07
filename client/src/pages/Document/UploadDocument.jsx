@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-hot-toast"; // for warning notifications
 import MainLayout from "@/layouts/MainLayout";
 import DocumentProgressBar from "@/components/DocumentProgressBar";
 import { useDocumentUpload } from "@/context/DocumentUploadContext";
@@ -8,29 +9,36 @@ export default function UploadDocument() {
   const { setData } = useDocumentUpload();
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
+  const [confirmed, setConfirmed] = useState(false); // <-- new
 
   // Add files
   const handleFiles = (incomingFiles) => {
-    const newFiles = Array.from(incomingFiles).map(file => ({
+    const newFiles = Array.from(incomingFiles).map((file) => ({
       file,
-      title: file.name // Default title
+      title: file.name, // Default title
     }));
-    setFiles(prev => [...prev, ...newFiles]);
+    setFiles((prev) => [...prev, ...newFiles]);
   };
 
   // Delete a file
   const deleteFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Update file title
   const updateTitle = (index, title) => {
-    setFiles(prev => prev.map((f, i) => i === index ? { ...f, title } : f));
+    setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, title } : f)));
   };
 
   const handleContinue = () => {
-    if (files.length === 0) return alert("Please upload at least one file");
-    setData(prev => ({ ...prev, files }));
+    if (files.length === 0)
+      return toast.error("Please upload at least one file");
+
+    if (!confirmed) {
+      return toast.error("You must confirm the document is original!");
+    }
+
+    setData((prev) => ({ ...prev, files }));
     navigate("/documents/info");
   };
 
@@ -41,7 +49,9 @@ export default function UploadDocument() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">Upload Document</h1>
-        <p className="text-gray-500 mt-2">Drag & drop files here or click to browse</p>
+        <p className="text-gray-500 mt-2">
+          Drag & drop files here or click to browse
+        </p>
       </div>
 
       {/* Upload box */}
@@ -72,7 +82,10 @@ export default function UploadDocument() {
         <div className="max-w-xl mx-auto mt-6 bg-white p-5 rounded-xl shadow">
           <h2 className="text-xl font-semibold mb-4">Files Selected</h2>
           {files.map((f, i) => (
-            <div key={i} className="flex justify-between items-center mb-3 border p-3 rounded-lg">
+            <div
+              key={i}
+              className="flex justify-between items-center mb-3 border p-3 rounded-lg"
+            >
               <input
                 type="text"
                 value={f.title}
@@ -88,9 +101,27 @@ export default function UploadDocument() {
             </div>
           ))}
 
+          <div className="flex items-center mt-4">
+            <input
+              type="checkbox"
+              id="confirm"
+              checked={confirmed}
+              onChange={(e) => setConfirmed(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="confirm" className="text-gray-700">
+              I confirm this document is original
+            </label>
+          </div>
+
           <button
             onClick={handleContinue}
-            className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            disabled={!confirmed}
+            className={`w-full mt-4 py-2 rounded-lg text-white ${
+              !confirmed
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Continue
           </button>

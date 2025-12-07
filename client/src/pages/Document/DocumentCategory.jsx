@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function DocumentCategory() {
   const { data, setData } = useDocumentUpload();
   const navigate = useNavigate();
-
+  
   const categories = [
     "Lecture Notes",
     "Assignments",
@@ -37,13 +37,6 @@ export default function DocumentCategory() {
             <option key={i} value={cat}>{cat}</option>
           ))}
         </select>
-
-        <textarea
-          placeholder="Description (optional)"
-          value={data.description || ""}
-          onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-          className="w-full border px-3 py-2 rounded"
-        />
 
         <button
           onClick={handleNext}

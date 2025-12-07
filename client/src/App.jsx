@@ -13,7 +13,6 @@ import DocumentCategory from "@/pages/Document/DocumentCategory";
 import DocumentReview from "@/pages/Document/DocumentReview";
 
 
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -81,6 +80,7 @@ export default function App() {
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+
     </BrowserRouter>
   );
 }

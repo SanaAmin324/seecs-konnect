@@ -2,10 +2,15 @@ import MainLayout from "@/layouts/MainLayout";
 import DocumentProgressBar from "@/components/DocumentProgressBar";
 import { useDocumentUpload } from "@/context/DocumentUploadContext";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function DocumentInfo() {
   const { data, setData } = useDocumentUpload();
   const navigate = useNavigate();
+
+  const [description, setDescription] = useState("");
+  const [descriptionLength, setDescriptionLength] = useState(0);
+  const [descError, setDescError] = useState("");
 
   const handleNext = () => {
     // Optional: validate all required fields
@@ -27,7 +32,7 @@ export default function DocumentInfo() {
           placeholder="Title"
           value={data.files?.[0]?.title || ""}
           onChange={(e) =>
-            setData(prev => ({
+            setData((prev) => ({
               ...prev,
               files: prev.files.map((f, i) =>
                 i === 0 ? { ...f, title: e.target.value } : f
@@ -37,16 +42,39 @@ export default function DocumentInfo() {
           className="w-full border px-3 py-2 rounded"
         />
 
-        <textarea
-          placeholder="Description"
-          value={data.description || ""}
-          onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
-          className="w-full border px-3 py-2 rounded"
-        />
+        <div className="max-w-xl mx-auto mt-6">
+          <label htmlFor="description" className="block mb-2 font-semibold">
+            Description
+          </label>
+          <textarea
+            id="description"
+            placeholder="Description (minimum 10 characters)"
+            value={description}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDescription(value);
+              setDescriptionLength(value.length);
+
+              if (value.length < 10) {
+                setDescError("Description must be at least 10 characters.");
+              } else {
+                setDescError("");
+                setData((prev) => ({ ...prev, description: value })); // save to context
+              }
+            }}
+            className="border p-2 w-full rounded"
+          />
+          <p className="text-sm text-gray-500">
+            {descriptionLength}/10 characters
+          </p>
+          {descError && <p className="text-red-600 mt-1">{descError}</p>}
+        </div>
 
         <select
           value={data.course || ""}
-          onChange={(e) => setData(prev => ({ ...prev, course: e.target.value }))}
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, course: e.target.value }))
+          }
           className="w-full border px-3 py-2 rounded"
         >
           <option value="">Select Course</option>
@@ -56,7 +84,9 @@ export default function DocumentInfo() {
 
         <select
           value={data.className || ""}
-          onChange={(e) => setData(prev => ({ ...prev, className: e.target.value }))}
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, className: e.target.value }))
+          }
           className="w-full border px-3 py-2 rounded"
         >
           <option value="">Select Class</option>
@@ -66,7 +96,9 @@ export default function DocumentInfo() {
 
         <select
           value={data.academicYear || ""}
-          onChange={(e) => setData(prev => ({ ...prev, academicYear: e.target.value }))}
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, academicYear: e.target.value }))
+          }
           className="w-full border px-3 py-2 rounded"
         >
           <option value="">Select Year</option>
@@ -75,8 +107,13 @@ export default function DocumentInfo() {
         </select>
 
         <button
-          onClick={handleNext}
-          className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          disabled={descError !== "" || description.length === 0}
+          onClick={() => navigate("/documents/category")}
+          className={`w-full mt-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 ${
+            descError || description.length === 0
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
         >
           Next
         </button>

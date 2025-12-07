@@ -9,10 +9,13 @@ export default function DocumentReview() {
   const { data } = useDocumentUpload();
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
+  const [notification, setNotification] = useState(""); // success message
 
   const handleSubmit = async () => {
     if (uploading) return;
     setUploading(true);
+    setNotification("");
+
     try {
       console.log("Submitting document data:", data);
 
@@ -41,18 +44,25 @@ export default function DocumentReview() {
       });
 
       const resData = await res.json();
+
       if (!res.ok) {
         console.error("Upload failed:", resData);
-        alert(resData.message || "Upload failed");
+        setNotification(resData.message || "Upload failed");
         setUploading(false);
         return;
       }
 
-      alert("Document submitted successfully!");
-      window.location.href = "/documents";
+      // Show notification instead of alert
+      setNotification("Document submitted successfully!");
+      setUploading(false);
+
+      // Optional: auto-redirect after 2s
+      setTimeout(() => {
+        navigate("/documents");
+      }, 2000);
     } catch (err) {
       console.error(err);
-      alert("Server error while uploading document");
+      setNotification("Server error while uploading document");
       setUploading(false);
     }
   };
@@ -79,6 +89,12 @@ export default function DocumentReview() {
           <p><strong>Category:</strong> {data.category}</p>
           <p><strong>Description:</strong> {data.description}</p>
         </div>
+
+        {notification && (
+          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+            {notification}
+          </div>
+        )}
 
         <div className="flex gap-4 mt-4">
           <button
