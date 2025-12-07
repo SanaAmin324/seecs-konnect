@@ -3,15 +3,58 @@ import MainLayout from "@/layouts/MainLayout";
 import DocumentProgressBar from "@/components/DocumentProgressBar";
 import { useDocumentUpload } from "@/context/DocumentUploadContext";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function DocumentReview() {
   const { data } = useDocumentUpload();
   const navigate = useNavigate();
+  const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = () => {
-    // TODO: handle actual upload API call
-    console.log("Submitting document data:", data);
-    alert("Document submitted successfully!");
+  const handleSubmit = async () => {
+    if (uploading) return;
+    setUploading(true);
+    try {
+      console.log("Submitting document data:", data);
+
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      const token = user?.token;
+
+      const form = new FormData();
+      const title = data.files?.[0]?.title || data.title || "Untitled";
+      form.append("title", title);
+      form.append("description", data.description || "");
+      form.append("course", data.course || "");
+      form.append("class", data.className || "");
+      form.append("academicYear", data.academicYear || "");
+      form.append("category", data.category || "");
+
+      if (data.files && Array.isArray(data.files)) {
+        data.files.forEach((f) => {
+          if (f?.file) form.append("files", f.file);
+        });
+      }
+
+      const res = await fetch("http://localhost:5000/api/documents/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: form,
+      });
+
+      const resData = await res.json();
+      if (!res.ok) {
+        console.error("Upload failed:", resData);
+        alert(resData.message || "Upload failed");
+        setUploading(false);
+        return;
+      }
+
+      alert("Document submitted successfully!");
+      window.location.href = "/documents";
+    } catch (err) {
+      console.error(err);
+      alert("Server error while uploading document");
+      setUploading(false);
+    }
   };
 
   return (
@@ -44,14 +87,13 @@ export default function DocumentReview() {
           >
             Back
           </button>
-          <Link to="/documents">
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            disabled={uploading}
+            className={`flex-1 ${uploading ? 'bg-green-400' : 'bg-green-600'} text-white py-2 rounded hover:bg-green-700`}
           >
-            Submit
+            {uploading ? 'Uploading...' : 'Submit'}
           </button>
-          </Link>
         </div>
       </div>
     </MainLayout>

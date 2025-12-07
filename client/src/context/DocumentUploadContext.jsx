@@ -8,7 +8,7 @@ export const useDocumentUpload = () => useContext(DocumentUploadContext);
 
 export const DocumentUploadProvider = ({ children }) => {
   const [data, setData] = useState({
-    file: null,
+    files: [],
     course: "",
     className: "",
     academicYear: "",
