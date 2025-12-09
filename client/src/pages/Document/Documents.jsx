@@ -171,12 +171,42 @@ const Documents = () => {
                         try {
                           const user = JSON.parse(localStorage.getItem("user") || "null");
                           const token = user?.token;
-                          const res = await fetch(`http://localhost:5000/api/documents/${doc.id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
-                          const json = await res.json();
-                          if (!res.ok) throw new Error(json.message || "Delete failed");
-                          alert("Deleted");
-                          fetchDocuments({ page: 1, limit: 6 });
-                        } catch (err) { console.error(err); alert("Failed to delete document"); }
+                          console.log("Delete attempt for doc", doc.id, "token present:", !!token);
+                          if (!token) {
+                            alert("You must be logged in to delete a document.");
+                            return;
+                          }
+
+                          const res = await fetch(`http://localhost:5000/api/documents/${doc.id}`, {
+                            method: "DELETE",
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+
+                          // Attempt to parse JSON or text message
+                          let body = null;
+                          const contentType = res.headers.get("content-type") || "";
+                          if (contentType.includes("application/json")) {
+                            body = await res.json();
+                          } else {
+                            const txt = await res.text();
+                            body = txt ? { message: txt } : null;
+                          }
+
+                          if (!res.ok) {
+                            console.error("Delete failed", { status: res.status, body });
+                            const serverMsg = body?.message || body || `Delete failed (status ${res.status})`;
+                            alert(`Delete failed: ${serverMsg}`);
+                            return;
+                          }
+
+                          console.log("Delete success", { status: res.status, body });
+                          alert(body?.message || "Deleted");
+                          // Optimistically remove the deleted doc from UI
+                          setFetchedDocs((prev) => prev.filter((d) => d.id !== doc.id));
+                        } catch (err) {
+                          console.error("Delete error", err);
+                          alert(`Failed to delete document: ${err?.message || err}`);
+                        }
                       }}>Delete</button>
                     </div>
                   </Card>

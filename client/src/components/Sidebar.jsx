@@ -14,6 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 
 const menuItems = [
@@ -25,6 +26,43 @@ const menuItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const [userName, setUserName] = useState("Student Name");
+  const [userProgram, setUserProgram] = useState("Computer Science 🎓");
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+
+      // Support different shapes: { name } or { user: { name } } etc.
+      const name = parsed?.name || parsed?.user?.name || parsed?.data?.name;
+      let program = parsed?.program || parsed?.user?.program || parsed?.data?.program;
+
+      if (name) setUserName(name);
+      if (program) setUserProgram(program);
+
+      // If program not present but we have a token, fetch profile to obtain missing fields
+      const token = parsed?.token || parsed?.user?.token || parsed?.data?.token;
+      if (!program && token) {
+        (async () => {
+          try {
+            const res = await fetch("http://localhost:5000/api/users/profile", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) return;
+            const profile = await res.json();
+            if (profile?.name) setUserName(profile.name);
+            if (profile?.program) setUserProgram(profile.program);
+          } catch (e) {
+            // ignore profile fetch errors
+          }
+        })();
+      }
+    } catch (e) {
+      // ignore parse errors
+    }
+  }, []);
 
   return (
     <Sidebar collapsible="icon" className="border-r-2 border-border/50 bg-sidebar/50 backdrop-blur-sm">
@@ -51,8 +89,8 @@ export function AppSidebar() {
                 </Avatar>
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0 animate-fade-in">
-                    <p className="font-semibold text-foreground truncate">Student Name</p>
-                    <p className="text-sm text-muted-foreground truncate">Computer Science 🎓</p>
+                    <p className="font-semibold text-foreground truncate">{userName}</p>
+                    <p className="text-sm text-muted-foreground truncate">{userProgram}</p>
                   </div>
                 )}
               </div>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { toast } from "react-hot-toast"; // for warning notifications
 import MainLayout from "@/layouts/MainLayout";
 import DocumentProgressBar from "@/components/DocumentProgressBar";
 import { useDocumentUpload } from "@/context/DocumentUploadContext";
@@ -31,13 +30,6 @@ export default function UploadDocument() {
   };
 
   const handleContinue = () => {
-    if (files.length === 0)
-      return toast.error("Please upload at least one file");
-
-    if (!confirmed) {
-      return toast.error("You must confirm the document is original!");
-    }
-
     setData((prev) => ({ ...prev, files }));
     navigate("/documents/info");
   };

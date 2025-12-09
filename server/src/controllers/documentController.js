@@ -110,7 +110,8 @@ const deleteDocument = async (req, res) => {
       }
     }
 
-    await doc.remove();
+    // `remove()` may not exist on newer Mongoose versions; use `deleteOne()` instead
+    await doc.deleteOne();
     res.json({ message: "Document and all files deleted successfully" });
   } catch (err) {
     console.error("Delete error:", err);
