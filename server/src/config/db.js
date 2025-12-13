@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ MongoDB Connected");
+    const conn = await mongoose.connect(process.env.MONGO_URI); // no extra options
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (err) {
-    console.error("❌ MongoDB Error:", err.message);
+    console.error("❌ MongoDB Connection Error:", err.message);
     process.exit(1);
   }
 };
 
-module.exports = connectDB; // CommonJS export
+module.exports = connectDB;
