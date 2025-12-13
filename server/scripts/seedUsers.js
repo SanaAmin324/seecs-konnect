@@ -51,6 +51,30 @@ const seedUsers = async () => {
         class: "B2",
         section: "S3",
         courses: ["DB", "CN", "OS"]
+    },
+
+    {
+        name: "Sana Amin",
+        cms: "456252",
+        email: "samin.bese23seecs@seecs.edu.pk",
+        password: hashedPassword,
+        program: "SE",
+        batch: "2023",
+        class: "SE-14",
+        section: "A",
+        courses: ["DB", "CN", "OS", "SE", "SC", "ITM"]
+    },
+
+    {
+        name: "Fatima Batool",
+        cms: "463405",
+        email: "fbatool.bese23seecs@seecs.edu.pk",
+        password: hashedPassword,
+        program: "SE",
+        batch: "2023",
+        class: "SE-14",
+        section: "A",
+        courses: ["DB", "CN", "OS", "SE", "SC", "ITM"]
     }
 ];
 

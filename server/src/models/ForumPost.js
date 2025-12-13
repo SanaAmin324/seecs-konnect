@@ -22,28 +22,21 @@ const forumPostSchema = new mongoose.Schema(
       },
     ],
 
-    likes: [
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    reposts: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    shares: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        comment: { type: String },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
 
-    reposts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
-    commentCount: {
-      type: Number,
-      default: 0,
-    },
+    commentCount: { type: Number, default: 0 },
   },
-  {
-    timestamps: true, // automatically stores createdAt and updatedAt
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("ForumPost", forumPostSchema);

@@ -8,6 +8,7 @@ const {
   getAllPosts,
   toggleLike,
   repost,
+  sharePost,
   deletePost,
   addComment,
   getComments,
@@ -27,6 +28,9 @@ router.post("/:id/like", protect, toggleLike);
 // Repost
 router.post("/:id/repost", protect, repost);
 
+// Share a post
+router.post("/:id/share", protect, sharePost);
+
 // Delete a post
 router.delete("/:postId", protect, deletePost);
 
@@ -41,6 +45,9 @@ router.delete("/comments/:commentId", protect, deleteComment);
 
 // Edit a post (content + media)
 router.patch("/:postId", protect, forumUpload.array("media", 5), editPost);
+
+
+
 
 
 module.exports = router;

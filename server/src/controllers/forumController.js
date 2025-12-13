@@ -85,6 +85,41 @@ exports.repost = asyncHandler(async (req, res) => {
 
   res.json({ message: "Reposted successfully" });
 });
+// -----------------------------------------------------
+// SHARE POST
+// -----------------------------------------------------
+exports.sharePost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { comment } = req.body;
+
+  if (!mongoose.isValidObjectId(id)) {
+    res.status(400);
+    throw new Error("Invalid post id");
+  }
+
+  const post = await ForumPost.findById(id);
+  if (!post) return res.status(404).json({ message: "Post not found" });
+
+  post.shares.push({
+    user: req.user._id,
+    comment: comment?.trim() || "",
+  });
+
+  await post.save();
+
+  // 🔔 Notification to post owner
+  if (post.user.toString() !== req.user._id.toString()) {
+    await Notification.create({
+      user: post.user,
+      type: "repost",
+      referenceId: post._id,
+      message: `${req.user.name} shared your post`,
+    });
+  }
+
+  res.json({ message: "Post shared successfully" });
+});
+
 
 // -----------------------------------------------------
 // DELETE POST
