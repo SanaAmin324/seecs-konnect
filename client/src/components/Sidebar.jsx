@@ -19,7 +19,7 @@ import { Separator } from "@/components/ui/separator";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/dashboard" },
-  { title: "My Resources", icon: FolderOpen, url: "/Documents" },
+  { title: "Resources", icon: FolderOpen, url: "/Documents" },
   { title: "Forums", icon: MessageSquare, url: "/forums" },
 ];
 

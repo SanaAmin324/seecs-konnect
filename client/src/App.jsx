@@ -11,6 +11,9 @@ import UploadDocument from "@/pages/Document/UploadDocument";
 import DocumentInfo from "@/pages/Document/DocumentInfo";
 import DocumentCategory from "@/pages/Document/DocumentCategory";
 import DocumentReview from "@/pages/Document/DocumentReview";
+import Forum from "./pages/Forum/Forum";
+import ForumPost from "./pages/Forum/ForumPost";
+import CreatePost from "./pages/Forum/CreatePost";
 
 
 export default function App() {
@@ -21,6 +24,12 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notfound" element={<NotFound />} />
+         {/* 👉 FORUM ROUTE */}
+         <Route path="/forums" element={<Forum />} />
+<Route path="/forums/:postId" element={<ForumPost />} />
+<Route path="/forums/create" element={<CreatePost />} />
+
+
 
         {/* Protected routes */}
         <Route
