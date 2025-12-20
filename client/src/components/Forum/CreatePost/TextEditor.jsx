@@ -34,6 +34,8 @@ const TextEditor = ({ value, onChange }) => {
           focus:outline-none
           prose prose-sm max-w-none
         "
+        dir="ltr"
+        style={{ direction: 'ltr' }}
         onInput={(e) => onChange(e.currentTarget.innerHTML)}
         dangerouslySetInnerHTML={{ __html: value }}
         suppressContentEditableWarning

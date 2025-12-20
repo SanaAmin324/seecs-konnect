@@ -16,6 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from uploads
+app.use('/uploads', express.static('uploads'));
+
 // Routes
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/documents", require("./routes/documentRoutes"));

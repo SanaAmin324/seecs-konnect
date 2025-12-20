@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import PostDetailCard from "@/components/forum/Post/PostDetailCard";
 import AddComment from "@/components/forum/Post/AddComment";
@@ -9,19 +10,33 @@ import RightSidebarCard from "@/components/forum/RightSidebarCard";
 const ForumPost = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // TEMP mock post
-  const post = {
-    id: postId,
-    title: "How do I prepare for my Software Engineering viva?",
-    author: "Fatima",
-    createdAt: "2025-01-15T10:00:00",
-    content:
-      "I have my viva next week and would appreciate tips from seniors.",
-    media: "https://via.placeholder.com/600x300",
-    likes: 124,
-    commentsCount: 8,
-  };
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:5000/api/forum/${postId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("Failed to fetch post");
+        const data = await res.json();
+        setPost(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [postId]);
+
+  if (loading) return <MainLayout><div>Loading...</div></MainLayout>;
+  if (error) return <MainLayout><div>Error: {error}</div></MainLayout>;
 
   return (
     <MainLayout>
@@ -42,13 +57,13 @@ const ForumPost = () => {
           <PostDetailCard post={post} />
 
           {/* ADD COMMENT */}
-          <AddComment />
+          <AddComment postId={postId} />
 
           {/* COMMENT TOOLS */}
           <CommentToolbar />
 
           {/* COMMENTS */}
-          <CommentSection />
+          <CommentSection postId={postId} />
         </div>
 
         {/* RIGHT SIDEBAR */}

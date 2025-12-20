@@ -3,10 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,9 +32,10 @@ export default function Login() {
 
       // Save user + token
       localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", data.token);
 
-      // Redirect to dashboard
-      navigate("/dashboard");
+      // Redirect to intended page or dashboard
+      navigate(location.state?.from || "/dashboard");
     } catch (err) {
       console.error(err);
       setError("Server not responding");

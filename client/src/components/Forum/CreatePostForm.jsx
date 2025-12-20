@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import PostTypeTabs from "@/components/Forum/CreatePost/PostTypeTabs";
 import PostTitleInput from "@/components/Forum/CreatePost/PostTitleInput";
@@ -11,25 +11,27 @@ import CreatePostActions from "@/components/Forum/CreatePost/CreatePostActions";
 
 const CreatePostForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login", { state: { from: location.pathname } });
+    }
+  }, [navigate, location.pathname]);
 
   const [postType, setPostType] = useState("text");
-  const [title, setTitle] = useState("");
-
+  const [title, setTitle] = useState(""); // UI only (optional for future)
   const [textBody, setTextBody] = useState("");
   const [mediaFiles, setMediaFiles] = useState([]);
   const [linkUrl, setLinkUrl] = useState("");
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /* -------------------- VALIDATION -------------------- */
   const canSubmit =
-    title.trim().length > 0 &&
-    (
-      (postType === "text" && textBody.trim().length > 0) ||
-      (postType === "image" && mediaFiles.length > 0) ||
-      (postType === "video" && mediaFiles.length > 0) ||
-      (postType === "link" && linkUrl.trim().length > 0)
-    );
+    (postType === "text" && textBody.trim().length > 0) ||
+    ((postType === "image" || postType === "video") && mediaFiles.length > 0) ||
+    (postType === "link" && linkUrl.trim().length > 0);
 
   /* -------------------- DRAFT HANDLING -------------------- */
   const handleSaveDraft = () => {
@@ -38,9 +40,8 @@ const CreatePostForm = () => {
       postType,
       title,
       textBody,
-      mediaFiles: [], // ⚠️ files themselves shouldn’t be stored
       linkUrl,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
@@ -52,35 +53,69 @@ const CreatePostForm = () => {
     setTitle(draft.title || "");
     setTextBody(draft.textBody || "");
     setLinkUrl(draft.linkUrl || "");
-    setMediaFiles([]); // files must be re-added manually
+    setMediaFiles([]); // files must be re-selected
   };
 
   /* -------------------- SUBMIT -------------------- */
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    const postPayload = {
-      type: postType,
-      title,
-      content: postType === "text" ? textBody : null,
-      linkUrl: postType === "link" ? linkUrl : null,
-      media: mediaFiles
-    };
+    try {
+      const formData = new FormData();
 
-    console.log("POST PAYLOAD:", postPayload);
+      // Required backend field
+      formData.append("content", textBody || "");
 
-    // TODO: replace with API call
-    // await createPost(postPayload);
+      // Media files
+      mediaFiles.forEach((file) => {
+        formData.append("media", file);
+      });
 
-    setIsSubmitting(false);
-    navigate("/forums");
+      // Links
+      if (postType === "link" && linkUrl.trim()) {
+        formData.append(
+          "links",
+          JSON.stringify([{ url: linkUrl }])
+        );
+      }
+
+      const res = await fetch("http://localhost:5000/api/forum", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login", { state: { from: location.pathname } });
+          return;
+        }
+        const err = await res.json();
+        throw new Error(err.message || "Failed to create post");
+      }
+
+      navigate("/forums");
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
-
       {/* Header */}
       <div className="flex justify-between items-center">
         <button
@@ -97,7 +132,7 @@ const CreatePostForm = () => {
       {/* Tabs */}
       <PostTypeTabs postType={postType} setPostType={setPostType} />
 
-      {/* Title */}
+      {/* Title (UI only for now) */}
       <PostTitleInput title={title} setTitle={setTitle} />
 
       {/* Body */}

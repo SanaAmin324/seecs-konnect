@@ -1,41 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import PostCard from "./PostCard";
 import PostCompact from "./PostCompact";
 import SortBar from "./SortBar";
 
-const dummyPosts = [
-  {
-    id: 1,
-    title: "How to prepare for SE midterms?",
-    author: "Ali",
-    content: "Any good resources or tips?",
-    createdAt: "2025-12-12",
-    views: 12,
-    upvotes: 8,
-    comments: 3,
-  },
-  {
-    id: 2,
-    title: "How to prepare for SE midterms?",
-    author: "Ali",
-    content: "Any good resources or tips?",
-    createdAt: "2025-12-12",
-    views: 12,
-    upvotes: 8,
-    comments: 3,
-  }
-  ,
-];
-
 const PostFeed = ({ sortType, setSortType }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [viewType, setViewType] = useState("card");
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login", { state: { from: location.pathname } });
+        return;
+      }
+      try {
+        const res = await fetch("http://localhost:5000/api/forum", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) {
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            navigate("/login", { state: { from: location.pathname } });
+            return;
+          }
+          throw new Error("Failed to fetch posts");
+        }
+        const data = await res.json();
+        setPosts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [navigate]);
 
   const sortedPosts =
     sortType === "recent"
-      ? [...dummyPosts].sort(
+      ? [...posts].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )
-      : [...dummyPosts].sort((a, b) => b.views - a.views);
+      : [...posts].sort((a, b) => b.likes?.length - a.likes?.length);
+
+  if (loading) return <div>Loading posts...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
@@ -51,9 +68,9 @@ const PostFeed = ({ sortType, setSortType }) => {
       <div className="space-y-4">
         {sortedPosts.map((post) =>
           viewType === "card" ? (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post._id} post={post} />
           ) : (
-            <PostCompact key={post.id} post={post} />
+            <PostCompact key={post._id} post={post} />
           )
         )}
       </div>

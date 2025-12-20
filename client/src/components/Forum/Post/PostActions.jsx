@@ -1,13 +1,66 @@
-import { Heart, MessageSquare, Share2 } from "lucide-react";
-import { useState } from "react";
+import { Heart, MessageSquare, Share2, Repeat2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const PostActions = ({ likes, commentsCount }) => {
+const PostActions = ({ likes, commentsCount, postId }) => {
+  const token = localStorage.getItem("token");
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(likes);
+  const [reposted, setReposted] = useState(false);
 
-  const toggleLike = () => {
-    setLiked(!liked);
-    setCount(liked ? count - 1 : count + 1);
+  useEffect(() => {
+    // Check if user liked
+    const userId = JSON.parse(atob(token.split('.')[1])).id;
+    // Assuming likes is populated array of users
+    // For simplicity, since we don't have populated likes in detail, assume not liked
+  }, [token]);
+
+  const toggleLike = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/forum/${postId}/like`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to toggle like");
+      setLiked((prev) => !prev);
+      setCount((prev) => (liked ? prev - 1 : prev + 1));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRepost = async () => {
+    if (reposted) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/forum/${postId}/repost`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to repost");
+      setReposted(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/forum/${postId}/share`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ comment: "" }),
+      });
+      if (!res.ok) throw new Error("Failed to share");
+      alert("Shared successfully");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -28,7 +81,20 @@ const PostActions = ({ likes, commentsCount }) => {
         {commentsCount} comments
       </div>
 
-      <button className="flex items-center gap-1 hover:text-foreground">
+      <button
+        onClick={handleRepost}
+        className={`flex items-center gap-1 hover:text-foreground ${
+          reposted ? "text-green-500" : ""
+        }`}
+      >
+        <Repeat2 size={16} />
+        Repost
+      </button>
+
+      <button
+        onClick={handleShare}
+        className="flex items-center gap-1 hover:text-foreground"
+      >
         <Share2 size={16} />
         Share
       </button>
