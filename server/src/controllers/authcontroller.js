@@ -12,13 +12,25 @@ const loginUser = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (user && (await user.matchPassword(password))) {
-    res.json({
+    const response = {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       token: generateToken(user._id),
-    });
+    };
+
+    // Only include student-specific fields if not admin
+    if (user.role !== "admin") {
+      response.cms = user.cms;
+      response.program = user.program;
+      response.batch = user.batch;
+      response.class = user.class;
+      response.section = user.section;
+      response.courses = user.courses;
+    }
+
+    res.json(response);
   } else {
     res.status(401).json({ message: "Invalid email or password" });
   }
@@ -29,18 +41,25 @@ const getUserProfile = async (req, res) => {
   if (!req.user) {
     return res.status(404).json({ message: "User not found" });
   }
-  res.json({
+
+  const response = {
     _id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     role: req.user.role,
-    cms: req.user.cms,
-    program: req.user.program,
-    batch: req.user.batch,
-    class: req.user.class,
-    section: req.user.section,
-    courses: req.user.courses,
-  });
+  };
+
+  // Only include student-specific fields if not admin
+  if (req.user.role !== "admin") {
+    response.cms = req.user.cms;
+    response.program = req.user.program;
+    response.batch = req.user.batch;
+    response.class = req.user.class;
+    response.section = req.user.section;
+    response.courses = req.user.courses;
+  }
+
+  res.json(response);
 };
 
 module.exports = { loginUser, getUserProfile };

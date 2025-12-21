@@ -1,4 +1,4 @@
-import { Home, FileText, MessageSquare, Settings, Users, LogOut, FolderOpen } from "lucide-react";
+import { Home, FileText, MessageSquare, Settings, Users, LogOut, FolderOpen, Flag } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +28,7 @@ export function AppSidebar() {
   const isCollapsed = state === "collapsed";
   const [userName, setUserName] = useState("Student Name");
   const [userProgram, setUserProgram] = useState("Computer Science 🎓");
+  const [userRole, setUserRole] = useState("user");
 
   useEffect(() => {
     try {
@@ -38,9 +39,11 @@ export function AppSidebar() {
       // Support different shapes: { name } or { user: { name } } etc.
       const name = parsed?.name || parsed?.user?.name || parsed?.data?.name;
       let program = parsed?.program || parsed?.user?.program || parsed?.data?.program;
+      const role = parsed?.role || parsed?.user?.role || parsed?.data?.role || "user";
 
       if (name) setUserName(name);
       if (program) setUserProgram(program);
+      if (role) setUserRole(role);
 
       // If program not present but we have a token, fetch profile to obtain missing fields
       const token = parsed?.token || parsed?.user?.token || parsed?.data?.token;
@@ -54,6 +57,7 @@ export function AppSidebar() {
             const profile = await res.json();
             if (profile?.name) setUserName(profile.name);
             if (profile?.program) setUserProgram(profile.program);
+            if (profile?.role) setUserRole(profile.role);
           } catch (e) {
             // ignore profile fetch errors
           }
@@ -90,7 +94,12 @@ export function AppSidebar() {
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0 animate-fade-in">
                     <p className="font-semibold text-foreground truncate">{userName}</p>
-                    <p className="text-sm text-muted-foreground truncate">{userProgram}</p>
+                    {userRole !== "admin" && (
+                      <p className="text-sm text-muted-foreground truncate">{userProgram}</p>
+                    )}
+                    {userRole === "admin" && (
+                      <p className="text-sm text-muted-foreground truncate">Admin</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -134,6 +143,25 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Admin Section */}
+        {userRole === "admin" && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Reports">
+                    <a href="/admin/reports" className="flex items-center gap-3 transition-all duration-200 hover:translate-x-1 hover:bg-destructive/10 rounded-xl px-3 py-2">
+                      <Flag className="w-4 h-4 text-destructive" />
+                      <span className="font-medium">Reports</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t-2 border-border/50 p-4">

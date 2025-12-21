@@ -15,20 +15,23 @@ const ReportsDashboard = () => {
 
   // Check if user is admin
   useEffect(() => {
-    if (!token) {
+    const token = localStorage.getItem("token");
+    const userJson = localStorage.getItem("user");
+    
+    if (!token || !userJson) {
       navigate("/login");
       return;
     }
 
     try {
-      const decoded = JSON.parse(atob(token.split(".")[1]));
-      if (decoded.role !== "admin") {
+      const user = JSON.parse(userJson);
+      if (user.role !== "admin") {
         navigate("/forums");
       }
     } catch (err) {
       navigate("/login");
     }
-  }, [token, navigate]);
+  }, [navigate]);
 
   // Fetch reports
   useEffect(() => {
@@ -39,14 +42,23 @@ const ReportsDashboard = () => {
     try {
       setLoading(true);
       const query = filterStatus ? `?status=${filterStatus}` : "";
-      const res = await fetch(`http://localhost:5000/api/reports/${query}`, {
+      const url = `http://localhost:5000/api/reports/${query}`;
+      console.log("Fetching reports from:", url);
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to fetch reports");
+      console.log("Response status:", res.status);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("API Error:", errorText);
+        throw new Error(`Failed to fetch reports: ${res.status}`);
+      }
       const data = await res.json();
+      console.log("Reports data:", data);
       setReports(data);
       setError(null);
     } catch (err) {
+      console.error("Fetch error:", err);
       setError(err.message);
       setReports([]);
     } finally {
