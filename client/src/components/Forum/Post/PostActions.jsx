@@ -1,11 +1,13 @@
 import { Heart, MessageSquare, Share2, Repeat2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import ShareModal from "../ShareModal";
 
-const PostActions = ({ likes, commentsCount, postId }) => {
+const PostActions = ({ likes, commentsCount, postId, postTitle }) => {
   const token = localStorage.getItem("token");
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(likes);
   const [reposted, setReposted] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     // Check if user liked
@@ -46,21 +48,8 @@ const PostActions = ({ likes, commentsCount, postId }) => {
     }
   };
 
-  const handleShare = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/forum/${postId}/share`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ comment: "" }),
-      });
-      if (!res.ok) throw new Error("Failed to share");
-      alert("Shared successfully");
-    } catch (err) {
-      console.error(err);
-    }
+  const handleShare = () => {
+    setShowShareModal(true);
   };
 
   return (
@@ -98,6 +87,13 @@ const PostActions = ({ likes, commentsCount, postId }) => {
         <Share2 size={16} />
         Share
       </button>
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        postId={postId}
+        postTitle={postTitle}
+      />
     </div>
   );
 };

@@ -78,7 +78,7 @@ const Documents = () => {
             <div className="flex items-center justify-between mb-8 animate-fade-in">
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
-                  Resources Library 📚
+                  Resources Library
                 </h1>
                 <p className="text-muted-foreground">Your cozy space for study materials</p>
               </div>
@@ -88,7 +88,7 @@ const Documents = () => {
               <CardContent className="p-6 space-y-4">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                  <Input type="search" placeholder="Search by title, course, instructor... 🔍" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-12 h-12 rounded-2xl border-2 border-border/50 bg-background/50" />
+                  <Input type="search" placeholder="Search by title, course, instructor..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-12 h-12 rounded-2xl border-2 border-border/50 bg-background/50" />
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
                   <Select value={selectedCourse} onValueChange={setSelectedCourse}>
@@ -127,7 +127,7 @@ const Documents = () => {
             <div className="mb-10 animate-fade-in">
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="w-6 h-6 text-accent" />
-                <h2 className="text-2xl font-bold text-foreground">Recently Uploaded 🆕</h2>
+                <h2 className="text-2xl font-bold text-foreground">Recently Uploaded</h2>
                 {loadingDocs && <span className="ml-3 text-sm text-muted-foreground">Loading...</span>}
               </div>
 
@@ -223,7 +223,7 @@ const Documents = () => {
                 <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center animate-bounce-soft">
                   <Upload className="w-12 h-12 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3">Share Your Knowledge! 🌟</h3>
+                <h3 className="text-2xl font-bold text-foreground mb-3">Share Your Knowledge</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">Help your fellow students by uploading your notes, study guides, or helpful resources</p>
                 <Link to="/documents/upload">
                   <Button size="lg" className="gap-2 rounded-3xl bg-linear-to-r from-primary via-accent to-secondary hover:shadow-xl text-white hover-bounce px-10">

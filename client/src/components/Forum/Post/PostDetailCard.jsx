@@ -50,7 +50,7 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border p-5 space-y-4">
+    <div className="bg-card rounded-xl border p-5 space-y-4">
       {/* Header with options menu */}
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1">
@@ -65,11 +65,11 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
         />
       </div>
 
-      <h1 className="text-xl font-semibold">{post.content.substring(0, 100)}...</h1>
+      <h1 className="text-xl font-semibold text-card-foreground">{post.content.substring(0, 100)}...</h1>
 
       {post.media && post.media.length > 0 && <PostMedia media={post.media} />}
 
-      <p className="text-gray-700 leading-relaxed">{getCleanContent(post.content)}</p>
+      <p className="text-card-foreground leading-relaxed">{getCleanContent(post.content)}</p>
 
       {(() => {
         const linksToShow = post.links && post.links.length > 0 
@@ -79,7 +79,7 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
         if (linksToShow.length > 0) {
           return (
             <div className="mt-4 space-y-3">
-              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Links</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Links</p>
               <div className="space-y-2">
                 {linksToShow.map((link, idx) => {
                   try {
@@ -89,7 +89,7 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
                     return (
                       <div
                         key={idx}
-                        className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-300 cursor-pointer"
+                        className="flex items-start gap-3 p-4 bg-primary/10 rounded-lg hover:bg-primary/20 transition border border-primary/30 cursor-pointer"
                         onClick={() => window.open(link.url, '_blank')}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -99,23 +99,23 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
                         role="button"
                         tabIndex={0}
                       >
-                        <span className="text-blue-600 text-2xl flex-shrink-0">🔗</span>
+                        <span className="text-primary text-2xl flex-shrink-0">🔗</span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-blue-700 truncate">
+                          <div className="text-sm font-semibold text-primary truncate">
                             {hostname}
                           </div>
-                          <div className="text-xs text-blue-600 truncate mt-1">
+                          <div className="text-xs text-primary/70 truncate mt-1">
                             {link.url}
                           </div>
                         </div>
-                        <span className="text-2xl text-blue-400 flex-shrink-0">→</span>
+                        <span className="text-2xl text-primary/60 flex-shrink-0">→</span>
                       </div>
                     );
                   } catch (err) {
                     return (
                       <div
                         key={idx}
-                        className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-300 cursor-pointer"
+                        className="flex items-center gap-3 p-4 bg-primary/10 rounded-lg hover:bg-primary/20 transition border border-primary/30 cursor-pointer"
                         onClick={() => window.open(link.url, '_blank')}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -125,11 +125,11 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
                         role="button"
                         tabIndex={0}
                       >
-                        <span className="text-blue-600 text-2xl flex-shrink-0">🔗</span>
-                        <span className="text-sm text-blue-600 truncate">
+                        <span className="text-primary text-2xl flex-shrink-0">🔗</span>
+                        <span className="text-sm text-primary/70 truncate">
                           {link.url}
                         </span>
-                        <span className="text-2xl text-blue-400 flex-shrink-0">→</span>
+                        <span className="text-2xl text-primary/60 flex-shrink-0">→</span>
                       </div>
                     );
                   }

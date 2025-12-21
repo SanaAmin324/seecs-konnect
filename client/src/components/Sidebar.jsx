@@ -96,7 +96,7 @@ export function AppSidebar() {
           <SidebarTrigger className="hover:bg-primary/10 rounded-xl transition-colors" />
           {!isCollapsed && (
             <h2 className="font-bold text-lg bg-linear-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-              SEECS Hub ✨
+              SEECS Konnect
             </h2>
           )}
         </div>

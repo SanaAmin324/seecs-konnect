@@ -1,6 +1,6 @@
 const ProfileHeader = () => {
   return (
-    <div className="bg-white rounded-xl border p-5 flex items-center gap-4">
+    <div className="bg-card rounded-xl border p-5 flex items-center gap-4">
       <img
         src="https://i.pravatar.cc/80"
         alt="avatar"
@@ -8,11 +8,11 @@ const ProfileHeader = () => {
       />
 
       <div>
-        <h2 className="text-xl font-semibold">Fatima</h2>
+        <h2 className="text-xl font-semibold text-card-foreground">Fatima</h2>
         <p className="text-sm text-muted-foreground">
           542 karma • Joined Sep 2023
         </p>
-        <p className="text-sm mt-1 text-gray-700">
+        <p className="text-sm mt-1 text-card-foreground">
           Software Engineering student
         </p>
       </div>

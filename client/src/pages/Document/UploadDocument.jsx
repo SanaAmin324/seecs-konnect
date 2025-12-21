@@ -41,14 +41,14 @@ export default function UploadDocument() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">Upload Document</h1>
-        <p className="text-gray-500 mt-2">
+        <p className="text-muted-foreground mt-2">
           Drag & drop files here or click to browse
         </p>
       </div>
 
       {/* Upload box */}
       <div
-        className="max-w-xl mx-auto border-2 border-dashed border-gray-400 rounded-xl p-10 bg-white text-center cursor-pointer hover:border-blue-500 transition"
+        className="max-w-xl mx-auto border-2 border-dashed border-border rounded-xl p-10 bg-card text-center cursor-pointer hover:border-primary transition"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -63,9 +63,9 @@ export default function UploadDocument() {
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <div className="text-gray-600">
+        <div className="text-foreground">
           <p className="text-lg font-semibold">Drag & Drop Files Here</p>
-          <p className="text-sm mt-1">or click to browse</p>
+          <p className="text-sm mt-1 text-muted-foreground">or click to browse</p>
         </div>
       </div>
 

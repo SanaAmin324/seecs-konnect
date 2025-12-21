@@ -13,11 +13,11 @@ const CommentItem = ({
   if (isNew) {
     return (
       <div className="flex gap-3">
-        <div className="w-9 h-9 bg-gray-300 rounded-full" />
+        <div className="w-9 h-9 bg-muted rounded-full" />
         <div className="flex-1">
           <textarea
             placeholder="Add a comment..."
-            className="w-full border rounded-lg p-2 text-sm"
+            className="w-full border border-border rounded-lg p-2 text-sm bg-input text-foreground"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
@@ -27,7 +27,7 @@ const CommentItem = ({
                 onSubmit(text);
                 setText("");
               }}
-              className="bg-blue-600 text-white px-4 py-1 rounded text-sm"
+              className="bg-primary text-primary-foreground px-4 py-1 rounded text-sm"
             >
               Comment
             </button>
@@ -41,21 +41,21 @@ const CommentItem = ({
     <div className="space-y-2">
       {/* Comment */}
       <div className="flex gap-3">
-        <div className="w-9 h-9 bg-gray-300 rounded-full" />
+        <div className="w-9 h-9 bg-muted rounded-full" />
 
         <div className="flex-1">
-          <div className="bg-gray-100 rounded-lg p-3">
-            <div className="text-sm font-medium">
+          <div className="bg-muted rounded-lg p-3">
+            <div className="text-sm font-medium text-foreground">
               {comment.author}
-              <span className="text-xs text-gray-500 ml-2">
+              <span className="text-xs text-muted-foreground ml-2">
                 {comment.time}
               </span>
             </div>
-            <p className="text-sm mt-1">{comment.text}</p>
+            <p className="text-sm mt-1 text-foreground">{comment.text}</p>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4 text-xs text-gray-500 mt-1 ml-2">
+          <div className="flex gap-4 text-xs text-muted-foreground mt-1 ml-2">
             <button className="hover:underline">Like</button>
             <button
               onClick={() => setReplying(!replying)}
@@ -70,14 +70,14 @@ const CommentItem = ({
             <div className="mt-2 ml-6">
               <textarea
                 placeholder="Write a reply..."
-                className="w-full border rounded-lg p-2 text-sm"
+                className="w-full border border-border rounded-lg p-2 text-sm bg-input text-foreground"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
               <div className="flex gap-2 justify-end mt-2">
                 <button
                   onClick={() => setReplying(false)}
-                  className="text-xs text-gray-500"
+                  className="text-xs text-muted-foreground"
                 >
                   Cancel
                 </button>
@@ -87,7 +87,7 @@ const CommentItem = ({
                     setText("");
                     setReplying(false);
                   }}
-                  className="bg-blue-600 text-white px-3 py-1 rounded text-xs"
+                  className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs"
                 >
                   Reply
                 </button>

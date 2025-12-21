@@ -40,7 +40,7 @@ export default function DocumentCategory() {
 
         <button
           onClick={handleNext}
-          className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="w-full mt-4 bg-primary text-white py-2 rounded hover:bg-primary/90"
         >
           Next
         </button>

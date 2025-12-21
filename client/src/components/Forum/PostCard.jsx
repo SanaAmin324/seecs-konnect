@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import ShareModal from "./ShareModal";
 
 const PostCard = ({ post, viewType }) => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const PostCard = ({ post, viewType }) => {
   const [expanded, setExpanded] = useState(false);
   const [reposts, setReposts] = useState(post.reposts?.length || 0);
   const [reposted, setReposted] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Remove URLs from content text to avoid duplication
   const getCleanContent = (content) => {
@@ -88,20 +90,13 @@ const PostCard = ({ post, viewType }) => {
     }
   };
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/forums/${post._id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      alert("Link copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy link", err);
-      alert("Failed to copy link");
-    }
+  const handleShare = () => {
+    setShowShareModal(true);
   };
 
   return (
     <div
-      className="bg-white rounded-xl border border-border/50 hover:shadow-md transition cursor-pointer"
+      className="bg-card rounded-xl border border-border/50 hover:shadow-md transition cursor-pointer"
       onClick={goToPost}
     >
       <div className="flex">
@@ -133,14 +128,14 @@ const PostCard = ({ post, viewType }) => {
 
           {/* HEADER */}
           <div className="text-xs text-muted-foreground mb-1">
-            <span className="font-semibold text-foreground">
+            <span className="font-semibold text-card-foreground">
               Forum
             </span>{" "}
             • Posted by {post.user?.name} • {timeAgo(post.createdAt)}
           </div>
 
           {/* TITLE - assuming no title, use content as title or something */}
-          <h3 className="font-semibold text-lg hover:underline">
+          <h3 className="font-semibold text-lg hover:underline text-card-foreground">
             {post.content.substring(0, 100)}...
           </h3>
 
@@ -183,7 +178,7 @@ const PostCard = ({ post, viewType }) => {
                 </div>
               )}
 
-              <p className="mt-3 text-sm text-gray-700">
+              <p className="mt-3 text-sm text-card-foreground">
                 {getCleanContent(post.content)}
               </p>
 
@@ -203,7 +198,7 @@ const PostCard = ({ post, viewType }) => {
                           return (
                             <div
                               key={idx}
-                              className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-300 cursor-pointer"
+                              className="flex items-start gap-3 p-3 bg-primary/10 rounded-lg hover:bg-primary/20 transition border border-primary/30 cursor-pointer"
                               onClick={() => window.open(link.url, '_blank')}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
@@ -213,23 +208,23 @@ const PostCard = ({ post, viewType }) => {
                               role="button"
                               tabIndex={0}
                             >
-                              <span className="text-blue-600 text-lg flex-shrink-0">🔗</span>
+                              <span className="text-primary text-lg flex-shrink-0">🔗</span>
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-blue-700 truncate">
+                                <div className="text-sm font-semibold text-primary truncate">
                                   {hostname}
                                 </div>
-                                <div className="text-xs text-blue-600 truncate mt-1">
+                                <div className="text-xs text-primary/70 truncate mt-1">
                                   {link.url}
                                 </div>
                               </div>
-                              <span className="text-xl text-blue-400 flex-shrink-0">→</span>
+                              <span className="text-xl text-primary/60 flex-shrink-0">→</span>
                             </div>
                           );
                         } catch (err) {
                           return (
                             <div
                               key={idx}
-                              className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-300 cursor-pointer"
+                              className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg hover:bg-primary/20 transition border border-primary/30 cursor-pointer"
                               onClick={() => window.open(link.url, '_blank')}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
@@ -239,11 +234,11 @@ const PostCard = ({ post, viewType }) => {
                               role="button"
                               tabIndex={0}
                             >
-                              <span className="text-blue-600 text-lg flex-shrink-0">🔗</span>
-                              <span className="text-xs text-blue-600 truncate">
+                              <span className="text-primary text-lg flex-shrink-0">🔗</span>
+                              <span className="text-xs text-primary/70 truncate">
                                 {link.url}
                               </span>
-                              <span className="text-xl text-blue-400 flex-shrink-0">→</span>
+                              <span className="text-xl text-primary/60 flex-shrink-0">→</span>
                             </div>
                           );
                         }
@@ -301,6 +296,13 @@ const PostCard = ({ post, viewType }) => {
           </div>
         </div>
       </div>
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        postId={post._id}
+        postTitle={post.title}
+      />
     </div>
   );
 };

@@ -8,14 +8,14 @@ const CreatePost = () => {
 
   return (
     <MainLayout>
-    <div className="min-h-screen bg-gray-100 py-6 px-4">
+    <div className="min-h-screen bg-background py-6 px-4">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
 
         {/* LEFT / MAIN */}
-        <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow">
+        <div className="lg:col-span-3 bg-card p-6 rounded-lg shadow">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-black mb-4"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
           >
             <ArrowLeft size={18} />
             Back
@@ -27,7 +27,7 @@ const CreatePost = () => {
         </div>
 
         {/* RIGHT SIDEBAR (EMPTY FOR NOW) */}
-        <div className="hidden lg:block bg-white rounded-lg shadow p-4 text-sm text-gray-400">
+        <div className="hidden lg:block bg-card rounded-lg shadow p-4 text-sm text-muted-foreground">
           Future content here
         </div>
 

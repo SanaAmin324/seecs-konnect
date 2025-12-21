@@ -64,7 +64,7 @@ export default function DocumentInfo() {
             }}
             className="border p-2 w-full rounded"
           />
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             {descriptionLength}/10 characters
           </p>
           {descError && <p className="text-red-600 mt-1">{descError}</p>}
@@ -109,7 +109,7 @@ export default function DocumentInfo() {
         <button
           disabled={descError !== "" || description.length === 0}
           onClick={() => navigate("/documents/category")}
-          className={`w-full mt-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 ${
+          className={`w-full mt-4 py-2 rounded-lg text-white bg-primary hover:bg-primary/90 ${
             descError || description.length === 0
               ? "opacity-50 cursor-not-allowed"
               : ""

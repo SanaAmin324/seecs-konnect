@@ -48,7 +48,7 @@ const AddComment = ({ postId, onCommentAdded }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border p-4 space-y-3">
+    <div className="bg-card rounded-xl border border-border p-4 space-y-3">
       <textarea
         value={text}
         onChange={(e) => {
@@ -56,7 +56,7 @@ const AddComment = ({ postId, onCommentAdded }) => {
           setError(null);
         }}
         placeholder="Add a comment..."
-        className="w-full border rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full border border-border rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 bg-background text-foreground placeholder:text-muted-foreground"
         rows={3}
         disabled={isSubmitting}
       />
@@ -67,7 +67,7 @@ const AddComment = ({ postId, onCommentAdded }) => {
         <button
           onClick={handleSubmit}
           disabled={isSubmitting || !text.trim()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700"
+          className="px-4 py-2 bg-primary text-white rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90"
         >
           {isSubmitting ? "Posting..." : "Comment"}
         </button>

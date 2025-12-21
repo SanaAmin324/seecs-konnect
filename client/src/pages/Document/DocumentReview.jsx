@@ -78,7 +78,7 @@ export default function DocumentReview() {
         {data.files?.map((f, i) => (
           <div key={i} className="flex justify-between items-center border p-2 rounded">
             <span>{f.title}</span>
-            <span className="text-gray-500 text-sm">{f.file?.type}</span>
+            <span className="text-muted-foreground text-sm">{f.file?.type}</span>
           </div>
         ))}
 
@@ -99,7 +99,7 @@ export default function DocumentReview() {
         <div className="flex gap-4 mt-4">
           <button
             onClick={() => navigate("/documents/category")}
-            className="flex-1 bg-gray-300 text-black py-2 rounded hover:bg-gray-400"
+            className="flex-1 bg-muted text-foreground py-2 rounded hover:bg-muted/80"
           >
             Back
           </button>

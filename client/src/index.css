@@ -48,95 +48,290 @@
   --radius: 1.25rem;
 }
 
-/* ------------------------- */
-/*    CSS VARIABLES (PASTEL) */
-/* ------------------------- */
+/* --------------------------------- */
+/*  CSS VARIABLES (PURPLE/BLACK THEME)  */
+/* --------------------------------- */
 
 :root {
-  --background: #fbf8f3; /* warm cream */
-  --foreground: #4a3728; /* soft brown */
+  /* Light Mode - Elegant Black & Purple Theme */
+  --background: #fafaf9; /* Off-white background */
+  --foreground: #0a0a0a; /* Deep black text */
 
   --card: #ffffff;
-  --card-foreground: #4a3728;
+  --card-foreground: #0a0a0a;
 
   --popover: #ffffff;
-  --popover-foreground: #4a3728;
+  --popover-foreground: #0a0a0a;
 
-  /* soft pastels */
-  --primary: #ffc4d6; /* soft pink */
-  --primary-foreground: #7a1f3d;
+  /* Primary: Rich Deep Purple */
+  --primary: #6d28d9; /* Vibrant deep purple */
+  --primary-foreground: #ffffff;
 
-  --secondary: #b8e6e6; /* soft cyan */
-  --secondary-foreground: #265959;
+  /* Secondary: Medium Purple */
+  --secondary: #8b5cf6; /* Medium vibrant purple */
+  --secondary-foreground: #ffffff;
 
-  --muted: #f7f2e8; /* warm beige */
-  --muted-foreground: #66523d;
+  /* Accent: Bright Violet */
+  --accent: #a855f7; /* Bright purple accent */
+  --accent-foreground: #ffffff;
 
-  --accent: #e4c4f0; /* soft lavender */
-  --accent-foreground: #663399;
+  --muted: #f3f0f9; /* Light purple-tinted */
+  --muted-foreground: #6d28d9;
 
-  --destructive: #f2a3a3;
-  --destructive-foreground: #8c3333;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
 
-  --border: #eeebe3;
-  --input: #f0ede6;
-  --ring: #ffc4d6;
+  --border: #e9d5ff; /* Light purple border */
+  --input: #fafbfc; /* Very light input */
+  --ring: #8b5cf6; /* Purple ring */
 
   --radius: 1.25rem;
 
-  /* whimsical custom tokens */
-  --peach: #ffd4b8;
-  --mint: #c4f0d4;
-  --lemon: #fff4cc;
-  --sky: #c4dcff;
+  /* Purple accent tokens */
+  --purple-light: #f3e8ff;
+  --purple-mid: #a78bfa;
+  --purple-dark: #5b21b6;
 
   /* sidebar */
-  --sidebar-background: #fcfcfc;
-  --sidebar-foreground: #624e3d;
-  --sidebar-primary: #ffc4d6;
-  --sidebar-primary-foreground: #843351;
-  --sidebar-accent: #f7f5ef;
-  --sidebar-accent-foreground: #624e3d;
-  --sidebar-border: #ece8dd;
-  --sidebar-ring: #ffc4d6;
+  --sidebar-background: #fdfbff;
+  --sidebar-foreground: #2d1b4e;
+  --sidebar-primary: #6d28d9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3e8ff;
+  --sidebar-accent-foreground: #6d28d9;
+  --sidebar-border: #e9d5ff;
+  --sidebar-ring: #8b5cf6;
 }
 
 .dark {
-  --background: #1a1a1a;
-  --foreground: #f2f2f2;
+  /* Dark Mode - Sleek Black & Purple Theme */
+  --background: #0a0a0a; /* Deep black */
+  --foreground: #f5f5f5; /* Off-white text */
 
-  --card: #222;
-  --card-foreground: #eee;
+  --card: #1a1a1a; /* Dark charcoal */
+  --card-foreground: #f5f5f5;
 
-  --primary: #ff85a2;
-  --primary-foreground: #3a0a16;
+  --primary: #a78bfa; /* Light purple */
+  --primary-foreground: #0a0a0a;
 
-  --secondary: #2f4f4f;
-  --secondary-foreground: #d6ffff;
+  --secondary: #c084fc; /* Bright medium purple */
+  --secondary-foreground: #0a0a0a;
 
-  --muted: #2a2a2a;
-  --muted-foreground: #cccccc;
+  --accent: #e879f9; /* Vibrant bright purple */
+  --accent-foreground: #0a0a0a;
 
-  --accent: #3b2d4a;
-  --accent-foreground: #e2caff;
+  --muted: #2d2d2d; /* Dark muted */
+  --muted-foreground: #d8d8d8;
 
-  --destructive: #ff6b6b;
-  --destructive-foreground: #3a0a0a;
+  --destructive: #ef4444;
+  --destructive-foreground: #0a0a0a;
 
-  --border: #333;
-  --input: #2b2b2b;
-  --ring: #ff85a2;
+  --border: #3d3d3d; /* Dark border */
+  --input: #1a1a1a; /* Dark input */
+  --ring: #c084fc; /* Light purple ring */
 
-  --sidebar-background: #1e1e1e;
-  --sidebar-foreground: #f5d5ff;
-  --sidebar-primary: #ff85a2;
-  --sidebar-primary-foreground: #330010;
-  --sidebar-accent: #2b2b2b;
-  --sidebar-accent-foreground: #f5d5ff;
-  --sidebar-border: #333;
-  --sidebar-ring: #ff85a2;
+  /* Dark mode purple tokens */
+  --purple-light: #d8d8d8;
+  --purple-mid: #a78bfa;
+  --purple-dark: #3d3d3d;
+
+  --sidebar-background: #1a1a1a;
+  --sidebar-foreground: #d8d8d8;
+  --sidebar-primary: #a78bfa;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #2d2d2d;
+  --sidebar-accent-foreground: #d8d8d8;
+  --sidebar-border: #3d3d3d;
+  --sidebar-ring: #c084fc;
 }
 
+
+/* Animations & Keyframes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(217, 70, 239, 0.5);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cloud-drift {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+}
+
+@keyframes gentle-sway {
+  0%, 100% {
+    transform: translateX(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateX(10px) rotate(1deg);
+  }
+}
+
+@keyframes float-down {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+}
+
+@keyframes cute-bounce {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation utility classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.6s ease-out;
+}
+
+.animate-cloud-drift {
+  animation: cloud-drift 6s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 2s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease-out;
+}
+
+.hover-bounce:hover {
+  animation: bounce 0.5s ease-in-out;
+}
+
+.animate-gentle-sway {
+  animation: gentle-sway 4s ease-in-out infinite;
+}
+
+.animate-cute-bounce {
+  animation: cute-bounce 2s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
 
 /* Base styles */
 @layer base {

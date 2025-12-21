@@ -10,7 +10,7 @@ const Dashboard = () => {
   return (
     <MainLayout>
       <h1 className="text-3xl font-bold mb-6">
-        Dashboard — Welcome {user.name} 👋
+        Dashboard — Welcome {user.name}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -7,8 +7,8 @@ const ProfileFavourites = () => {
   return (
     <div className="space-y-4">
       {docs.map((doc) => (
-        <div key={doc.id} className="bg-white border rounded-xl p-4">
-          <h4 className="font-medium">{doc.title}</h4>
+        <div key={doc.id} className="bg-card border rounded-xl p-4">
+          <h4 className="font-medium text-card-foreground">{doc.title}</h4>
           <p className="text-xs text-muted-foreground">{doc.type}</p>
         </div>
       ))}
