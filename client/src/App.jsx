@@ -1,38 +1,66 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+/* Pages */
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/Notfound";
+
+/* Auth */
+import ProtectedRoute from "./components/ProtectedRoute";
+
+/* Documents */
 import Documents from "./pages/Document/Documents";
 import { DocumentUploadProvider } from "@/context/DocumentUploadContext";
-// Correct imports example
 import UploadDocument from "@/pages/Document/UploadDocument";
 import DocumentInfo from "@/pages/Document/DocumentInfo";
 import DocumentCategory from "@/pages/Document/DocumentCategory";
 import DocumentReview from "@/pages/Document/DocumentReview";
+
+/* Forum */
 import Forum from "./pages/Forum/Forum";
 import ForumPost from "./pages/Forum/ForumPost";
 import CreatePost from "./pages/Forum/CreatePost";
-import ReportsDashboard from "./pages/Admin/ReportsDashboard";
 
+/* User */
+import UserProfile from "@/pages/UserProfile";
+
+/* Admin */
+import ReportsDashboard from "./pages/Admin/ReportsDashboard";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
+        {/* ===================== */}
+        {/* Public Routes */}
+        {/* ===================== */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notfound" element={<NotFound />} />
-         {/* 👉 FORUM ROUTE */}
-         <Route path="/forums" element={<Forum />} />
-<Route path="/forums/:postId" element={<ForumPost />} />
-<Route path="/forums/create" element={<CreatePost />} />
 
+        {/* ===================== */}
+        {/* Forum Routes (Public) */}
+        {/* ===================== */}
+        <Route path="/forums" element={<Forum />} />
+        <Route path="/forums/create" element={<CreatePost />} />
+        <Route path="/forums/:postId" element={<ForumPost />} />
 
+        {/* ===================== */}
+        {/* User Profile (Protected) */}
+        {/* ===================== */}
+        <Route
+          path="/u/:username"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Protected routes */}
+        {/* ===================== */}
+        {/* Dashboard */}
+        {/* ===================== */}
         <Route
           path="/dashboard"
           element={
@@ -42,6 +70,9 @@ export default function App() {
           }
         />
 
+        {/* ===================== */}
+        {/* Documents */}
+        {/* ===================== */}
         <Route
           path="/documents"
           element={
@@ -87,7 +118,9 @@ export default function App() {
           }
         />
 
+        {/* ===================== */}
         {/* Admin Routes */}
+        {/* ===================== */}
         <Route
           path="/admin/reports"
           element={
@@ -97,10 +130,11 @@ export default function App() {
           }
         />
 
+        {/* ===================== */}
         {/* Fallback */}
+        {/* ===================== */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-
     </BrowserRouter>
   );
 }
