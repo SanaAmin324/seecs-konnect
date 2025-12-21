@@ -14,29 +14,40 @@ const ForumPost = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchPost = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:5000/api/forum/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch post");
+      const data = await res.json();
+      setPost(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:5000/api/forum/${postId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch post");
-        const data = await res.json();
-        setPost(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPost();
   }, [postId]);
 
-  if (loading) return <MainLayout><div>Loading...</div></MainLayout>;
-  if (error) return <MainLayout><div>Error: {error}</div></MainLayout>;
+  const handlePostDeleted = () => {
+    navigate("/forums");
+  };
+
+  const handlePostEdited = () => {
+    fetchPost();
+  };
+
+  if (loading) return <MainLayout><div className="text-center py-8">Loading...</div></MainLayout>;
+  if (error) return <MainLayout><div className="text-red-600 text-center py-8">Error: {error}</div></MainLayout>;
+  if (!post) return <MainLayout><div className="text-center py-8">Post not found</div></MainLayout>;
 
   return (
     <MainLayout>
@@ -54,7 +65,11 @@ const ForumPost = () => {
           </button>
 
           {/* POST */}
-          <PostDetailCard post={post} />
+          <PostDetailCard 
+            post={post} 
+            onPostDeleted={handlePostDeleted}
+            onPostEdited={handlePostEdited}
+          />
 
           {/* ADD COMMENT */}
           <AddComment postId={postId} />

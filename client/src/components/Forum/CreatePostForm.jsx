@@ -72,14 +72,36 @@ const CreatePostForm = () => {
       const formData = new FormData();
 
       // Required backend field
-      formData.append("content", textBody || "");
+      let contentToSend = textBody || "";
+      
+      // If link post, add link to content
+      if (postType === "link" && linkUrl.trim()) {
+        contentToSend = `${linkUrl}\n\n${textBody || ""}`;
+      }
+      
+      formData.append("content", contentToSend.trim());
 
-      // Media files
-      mediaFiles.forEach((file) => {
-        formData.append("media", file);
-      });
+      // Media files - validate each file
+      if (mediaFiles.length > 0) {
+        for (let i = 0; i < mediaFiles.length; i++) {
+          const file = mediaFiles[i];
+          
+          // Validate file size (50MB max)
+          if (file.size > 50 * 1024 * 1024) {
+            throw new Error(`File "${file.name}" is too large. Max 50MB allowed.`);
+          }
+          
+          // Validate file type
+          const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'];
+          if (!validTypes.some(type => file.type.includes(type))) {
+            throw new Error(`File "${file.name}" has an unsupported format. Please use image or video files.`);
+          }
+          
+          formData.append("media", file);
+        }
+      }
 
-      // Links
+      // Links as JSON (if explicitly a link post)
       if (postType === "link" && linkUrl.trim()) {
         formData.append(
           "links",
@@ -105,10 +127,20 @@ const CreatePostForm = () => {
         throw new Error(err.message || "Failed to create post");
       }
 
+      const result = await res.json();
+      console.log("Post created successfully:", result);
+      
+      // Reset form
+      setTextBody("");
+      setMediaFiles([]);
+      setLinkUrl("");
+      setTitle("");
+      
+      alert("Post created successfully!");
       navigate("/forums");
     } catch (error) {
-      console.error(error);
-      alert(error.message || "Something went wrong");
+      console.error("Post creation error:", error);
+      alert(error.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

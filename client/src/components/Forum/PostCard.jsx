@@ -18,6 +18,26 @@ const PostCard = ({ post, viewType }) => {
   const [reposts, setReposts] = useState(post.reposts?.length || 0);
   const [reposted, setReposted] = useState(false);
 
+  // Remove URLs from content text to avoid duplication
+  const getCleanContent = (content) => {
+    if (!content) return content;
+    // Remove common URL patterns from the content
+    return content
+      .replace(/https?:\/\/[^\s]+/g, '')
+      .replace(/www\.[^\s]+/g, '')
+      .trim();
+  };
+
+  // Extract URLs from content if links array is not populated
+  const extractLinksFromContent = (content) => {
+    if (!content) return [];
+    const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+    const matches = content.match(urlRegex) || [];
+    return matches.map(url => ({
+      url: url.startsWith('http') ? url : 'https://' + url
+    }));
+  };
+
   useEffect(() => {
     // Check if current user liked/reposted
     const userId = JSON.parse(atob(token.split('.')[1])).id; // decode JWT to get user id
@@ -128,29 +148,111 @@ const PostCard = ({ post, viewType }) => {
           {(viewType === "card" || expanded) && (
             <>
               {post.media && post.media.length > 0 && (
-                <img
-                  src={`http://localhost:5000/${post.media[0].path}`}
-                  alt="post media"
-                  className="rounded-lg mt-3 max-h-[350px] object-cover"
-                  onClick={(e) => e.stopPropagation()}
-                />
+                <div className="mt-3 rounded-lg overflow-hidden">
+                  {(() => {
+                    const mediaItem = post.media[0];
+                    const typeFromExt = mediaItem.filename?.toLowerCase().match(/\.(mp4|webm|mov|avi)$/i) ? 'video' : 'image';
+                    const mediaType = mediaItem.type || typeFromExt;
+                    
+                    return mediaType === "video" ? (
+                      <video
+                        src={`http://localhost:5000/uploads/forum/${mediaItem.filename}`}
+                        className="w-full max-h-[350px] object-cover bg-black rounded-lg"
+                        controls
+                        controlsList="nodownload"
+                        preload="metadata"
+                        onClick={(e) => e.stopPropagation()}
+                        onError={(e) => {
+                          console.error("Video loading error:", e);
+                        }}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={`http://localhost:5000/uploads/forum/${mediaItem.filename}`}
+                        alt="post media"
+                        className="w-full max-h-[350px] object-cover rounded-lg"
+                        onClick={(e) => e.stopPropagation()}
+                        onError={(e) => {
+                          console.error("Image loading error:", e);
+                        }}
+                      />
+                    );
+                  })()}
+                </div>
               )}
 
-              <p className="mt-2 text-sm text-foreground">
-                {post.content}
+              <p className="mt-3 text-sm text-gray-700">
+                {getCleanContent(post.content)}
               </p>
 
-              {post.links && post.links.length > 0 && (
-                <a
-                  href={post.links[0].url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline mt-2 block"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {post.links[0].url}
-                </a>
-              )}
+              {(() => {
+                const linksToShow = post.links && post.links.length > 0 
+                  ? post.links 
+                  : extractLinksFromContent(post.content);
+                
+                if (linksToShow.length > 0) {
+                  return (
+                    <div className="mt-4 space-y-2" onClick={(e) => e.stopPropagation()}>
+                      {linksToShow.slice(0, 2).map((link, idx) => {
+                        try {
+                          const urlObj = new URL(link.url);
+                          const hostname = urlObj.hostname.replace('www.', '');
+                          
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-300 cursor-pointer"
+                              onClick={() => window.open(link.url, '_blank')}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  window.open(link.url, '_blank');
+                                }
+                              }}
+                              role="button"
+                              tabIndex={0}
+                            >
+                              <span className="text-blue-600 text-lg flex-shrink-0">🔗</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-blue-700 truncate">
+                                  {hostname}
+                                </div>
+                                <div className="text-xs text-blue-600 truncate mt-1">
+                                  {link.url}
+                                </div>
+                              </div>
+                              <span className="text-xl text-blue-400 flex-shrink-0">→</span>
+                            </div>
+                          );
+                        } catch (err) {
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-300 cursor-pointer"
+                              onClick={() => window.open(link.url, '_blank')}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  window.open(link.url, '_blank');
+                                }
+                              }}
+                              role="button"
+                              tabIndex={0}
+                            >
+                              <span className="text-blue-600 text-lg flex-shrink-0">🔗</span>
+                              <span className="text-xs text-blue-600 truncate">
+                                {link.url}
+                              </span>
+                              <span className="text-xl text-blue-400 flex-shrink-0">→</span>
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </>
           )}
 

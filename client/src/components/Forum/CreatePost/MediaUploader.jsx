@@ -1,9 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const MediaUploader = ({ files, setFiles }) => {
 
   const addFiles = (newFiles) => {
-    setFiles((prev) => [...prev, ...Array.from(newFiles)]);
+    const validFiles = [];
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'];
+    const maxSize = 50 * 1024 * 1024; // 50MB
+
+    for (let file of newFiles) {
+      // Check file type
+      if (!validTypes.some(type => file.type.includes(type))) {
+        alert(`File "${file.name}" has unsupported format. Please use images or videos.`);
+        continue;
+      }
+
+      // Check file size
+      if (file.size > maxSize) {
+        alert(`File "${file.name}" is too large. Max 50MB allowed.`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) {
+      setFiles((prev) => [...prev, ...validFiles]);
+    }
   };
 
   const removeFile = (index) => {
@@ -12,7 +34,11 @@ const MediaUploader = ({ files, setFiles }) => {
 
   useEffect(() => {
     return () => {
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
+      files.forEach((file) => {
+        if (file.preview) {
+          URL.revokeObjectURL(file.preview);
+        }
+      });
     };
   }, [files]);
 
@@ -33,11 +59,14 @@ const MediaUploader = ({ files, setFiles }) => {
         <input
           type="file"
           multiple
-          accept="image/*,video/*"
+          accept="image/jpeg,image/png,image/gif,video/mp4,video/webm"
           className="hidden"
           onChange={(e) => addFiles(e.target.files)}
         />
-        Drag & drop or choose files
+        <div className="text-sm">
+          <p className="font-medium">Drag & drop or choose files</p>
+          <p className="text-xs text-gray-500 mt-1">Supported: JPG, PNG, GIF, MP4, WebM (Max 50MB)</p>
+        </div>
       </label>
 
       {/* Preview Grid */}
@@ -52,19 +81,21 @@ const MediaUploader = ({ files, setFiles }) => {
                 {isVideo ? (
                   <video
                     src={url}
-                    className="rounded-md h-28 w-full object-cover"
+                    className="rounded-md h-28 w-full object-cover bg-black"
                     controls
                   />
                 ) : (
                   <img
                     src={url}
                     className="rounded-md h-28 w-full object-cover"
+                    alt={`Preview ${idx}`}
                   />
                 )}
 
                 <button
+                  type="button"
                   onClick={() => removeFile(idx)}
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full px-2"
+                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full px-2 py-0.5 text-sm hover:bg-black/80"
                 >
                   ✕
                 </button>

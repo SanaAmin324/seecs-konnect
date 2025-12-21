@@ -14,6 +14,7 @@ import DocumentReview from "@/pages/Document/DocumentReview";
 import Forum from "./pages/Forum/Forum";
 import ForumPost from "./pages/Forum/ForumPost";
 import CreatePost from "./pages/Forum/CreatePost";
+import ReportsDashboard from "./pages/Admin/ReportsDashboard";
 
 
 export default function App() {
@@ -83,6 +84,16 @@ export default function App() {
             <DocumentUploadProvider>
               <DocumentReview />
             </DocumentUploadProvider>
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/reports"
+          element={
+            <ProtectedRoute>
+              <ReportsDashboard />
+            </ProtectedRoute>
           }
         />
 

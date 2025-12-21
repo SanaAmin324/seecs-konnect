@@ -241,6 +241,134 @@ const addComment = asyncHandler(async (req, res) => {
   res.status(201).json(comment);
 });
 
+// -----------------------------------------------------
+// GET COMMENTS FOR A POST
+// -----------------------------------------------------
+const getComments = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+
+  if (!mongoose.isValidObjectId(postId)) {
+    res.status(400);
+    throw new Error("Invalid post id");
+  }
+
+  const comments = await Comment.find({ post: postId })
+    .populate("user", "name email")
+    .sort({ createdAt: -1 });
+
+  res.json(comments);
+});
+
+// -----------------------------------------------------
+// EDIT POST
+// -----------------------------------------------------
+const editPost = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const { content, links } = req.body;
+  const userId = req.user._id;
+
+  if (!mongoose.isValidObjectId(postId)) {
+    res.status(400);
+    throw new Error("Invalid post id");
+  }
+
+  if (!content || !content.trim()) {
+    return res.status(400).json({ message: "Content is required" });
+  }
+
+  const post = await ForumPost.findById(postId);
+  if (!post) return res.status(404).json({ message: "Post not found" });
+
+  // Only user who created the post can edit it (or admin)
+  if (post.user.toString() !== userId.toString() && req.user.role !== "admin") {
+    res.status(403);
+    throw new Error("Not authorized to edit this post");
+  }
+
+  // Update content
+  post.content = content.trim();
+
+  // Update links if provided
+  if (links) {
+    try {
+      post.links = JSON.parse(links);
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid links format" });
+    }
+  }
+
+  // Handle new media uploads
+  if (req.files && req.files.length > 0) {
+    const newMediaFiles = req.files.map((file) => {
+      let type = "document";
+      if (file.mimetype.startsWith("image/")) type = "image";
+      else if (file.mimetype.startsWith("video/")) type = "video";
+
+      return {
+        type,
+        filename: file.filename,
+        path: file.path,
+        mimetype: file.mimetype,
+      };
+    });
+
+    post.media = [...post.media, ...newMediaFiles];
+  }
+
+  await post.save();
+
+  // Populate and return updated post
+  await post.populate("user", "name email");
+
+  res.json({
+    message: "Post updated successfully",
+    post,
+  });
+});
+
+// -----------------------------------------------------
+// REMOVE MEDIA FROM POST
+// -----------------------------------------------------
+const removeMediaFromPost = asyncHandler(async (req, res) => {
+  const { postId, mediaIndex } = req.params;
+  const userId = req.user._id;
+
+  if (!mongoose.isValidObjectId(postId)) {
+    res.status(400);
+    throw new Error("Invalid post id");
+  }
+
+  const post = await ForumPost.findById(postId);
+  if (!post) return res.status(404).json({ message: "Post not found" });
+
+  // Only user who created the post can remove media
+  if (post.user.toString() !== userId.toString() && req.user.role !== "admin") {
+    res.status(403);
+    throw new Error("Not authorized to modify this post");
+  }
+
+  const idx = parseInt(mediaIndex);
+  if (idx < 0 || idx >= post.media.length) {
+    return res.status(400).json({ message: "Invalid media index" });
+  }
+
+  // Delete file from storage
+  try {
+    const file = post.media[idx];
+    if (fs.existsSync(file.path)) {
+      await fs.promises.unlink(file.path);
+    }
+  } catch (err) {
+    console.error("Failed to delete file:", err);
+  }
+
+  // Remove from array
+  post.media.splice(idx, 1);
+  await post.save();
+
+  res.json({ message: "Media removed successfully" });
+});
+
 module.exports = {
   createPost,
   getAllPosts,
@@ -250,4 +378,7 @@ module.exports = {
   sharePost,
   deletePost,
   addComment,
+  getComments,
+  editPost,
+  removeMediaFromPost,
 };

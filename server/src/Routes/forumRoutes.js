@@ -12,6 +12,9 @@ const {
   sharePost,
   deletePost,
   addComment,
+  getComments,
+  editPost,
+  removeMediaFromPost,
 } = require("../controllers/forumController");
 
 // Create a post (with media)
@@ -32,23 +35,19 @@ router.post("/:id/repost", protect, toggleRepost);
 // Share a post
 router.post("/:id/share", protect, sharePost);
 
+// Edit a post
+router.patch("/:postId", protect, forumUpload.array("media", 5), editPost);
+
+// Remove media from post
+router.delete("/:postId/media/:mediaIndex", protect, removeMediaFromPost);
+
 // Delete a post
 router.delete("/:postId", protect, deletePost);
 
 // Add a comment
 router.post("/:postId/comment", protect, addComment);
 
-// Get comments
-// router.get("/:postId/comments", getComments);
-
-// Delete a comment
-// router.delete("/comments/:commentId", protect, deleteComment);
-
-// Edit a post (content + media)
-// router.patch("/:postId", protect, forumUpload.array("media", 5), editPost);
-
-
-
-
+// Get comments for a post
+router.get("/:postId/comments", protect, getComments);
 
 module.exports = router;
