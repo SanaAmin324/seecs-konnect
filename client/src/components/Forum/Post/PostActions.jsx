@@ -1,24 +1,39 @@
-import { Heart, MessageSquare, Share2, Repeat2 } from "lucide-react";
+import { Heart, MessageSquare, Share2, Repeat2, Bookmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import ShareModal from "../ShareModal";
 
 const PostActions = ({ likes, commentsCount, postId, postTitle }) => {
-  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = user?.token;
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(likes);
   const [reposted, setReposted] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
-    // Check if user liked
-    const userId = JSON.parse(atob(token.split('.')[1])).id;
-    // Assuming likes is populated array of users
-    // For simplicity, since we don't have populated likes in detail, assume not liked
-  }, [token]);
+    // Check if user saved this post
+    const checkSavedStatus = async () => {
+      try {
+        if (token) {
+          const res = await fetch("http://localhost:5000/api/forums/user/saved", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const savedPosts = await res.json();
+            setSaved(savedPosts.some(p => p._id === postId));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to check saved status:", err);
+      }
+    };
+    checkSavedStatus();
+  }, [token, postId]);
 
   const toggleLike = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/forum/${postId}/like`, {
+      const res = await fetch(`http://localhost:5000/api/forums/${postId}/like`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -33,18 +48,40 @@ const PostActions = ({ likes, commentsCount, postId, postTitle }) => {
   };
 
   const handleRepost = async () => {
-    if (reposted) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/forum/${postId}/repost`, {
+      const res = await fetch(`http://localhost:5000/api/forums/${postId}/repost`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) throw new Error("Failed to repost");
-      setReposted(true);
+      setReposted((prev) => !prev);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const toggleSave = async () => {
+    try {
+      if (!token) {
+        alert("Please log in to save posts");
+        return;
+      }
+      const res = await fetch(`http://localhost:5000/api/forums/${postId}/save`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to toggle save");
+      }
+      setSaved((prev) => !prev);
+    } catch (err) {
+      console.error("Save error:", err);
+      alert(err.message || "Failed to save post");
     }
   };
 
@@ -78,6 +115,16 @@ const PostActions = ({ likes, commentsCount, postId, postTitle }) => {
       >
         <Repeat2 size={16} />
         Repost
+      </button>
+
+      <button
+        onClick={toggleSave}
+        className={`flex items-center gap-1 hover:text-foreground ${
+          saved ? "text-blue-500" : ""
+        }`}
+      >
+        <Bookmark size={16} fill={saved ? "currentColor" : "none"} />
+        {saved ? "Saved" : "Save"}
       </button>
 
       <button

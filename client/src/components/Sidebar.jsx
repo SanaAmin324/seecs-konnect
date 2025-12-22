@@ -121,9 +121,8 @@ export function AppSidebar() {
                     isCollapsed ? "w-10 h-10" : "w-12 h-12"
                   }`}
                 >
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback className="bg-linear-to-br from-primary to-accent text-white">
-                    SC
+                  <AvatarFallback className="bg-gradient-to-br from-primary via-accent to-secondary text-white font-bold">
+                    {userName?.charAt(0)?.toUpperCase() || '?'}
                   </AvatarFallback>
                 </Avatar>
                 {!isCollapsed && (

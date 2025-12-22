@@ -4,6 +4,7 @@ import {
   Share2,
   ChevronDown,
   Repeat2,
+  Bookmark,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -11,13 +12,15 @@ import ShareModal from "./ShareModal";
 
 const PostCard = ({ post, viewType }) => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = user?.token;
 
   const [likes, setLikes] = useState(post.likes?.length || 0);
   const [liked, setLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [reposts, setReposts] = useState(post.reposts?.length || 0);
   const [reposted, setReposted] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
   // Remove URLs from content text to avoid duplication
@@ -41,11 +44,30 @@ const PostCard = ({ post, viewType }) => {
   };
 
   useEffect(() => {
-    // Check if current user liked/reposted
-    const userId = JSON.parse(atob(token.split('.')[1])).id; // decode JWT to get user id
-    setLiked(post.likes?.some(like => like.toString() === userId));
-    setReposted(post.reposts?.some(repost => repost.toString() === userId));
-  }, [post, token]);
+    // Check if current user liked/reposted/saved
+    const fetchUserSavedStatus = async () => {
+      try {
+        if (token) {
+          const res = await fetch("http://localhost:5000/api/forums/user/saved", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const savedPosts = await res.json();
+            setSaved(savedPosts.some(p => p._id === post._id));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to check saved status:", err);
+      }
+    };
+    
+    if (token && user?._id) {
+      const userId = user._id;
+      setLiked(post.likes?.some(like => like._id?.toString() === userId || like.toString() === userId));
+      setReposted(post.reposts?.some(repost => repost._id?.toString() === userId || repost.toString() === userId));
+      fetchUserSavedStatus();
+    }
+  }, [post, token, user]);
 
   const goToPost = () => {
     navigate(`/forums/${post._id}`);
@@ -60,7 +82,7 @@ const PostCard = ({ post, viewType }) => {
 
   const toggleLike = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/forum/${post._id}/like`, {
+      const res = await fetch(`http://localhost:5000/api/forums/${post._id}/like`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,7 +98,7 @@ const PostCard = ({ post, viewType }) => {
 
   const handleRepost = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/forum/${post._id}/repost`, {
+      const res = await fetch(`http://localhost:5000/api/forums/${post._id}/repost`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,6 +109,29 @@ const PostCard = ({ post, viewType }) => {
       setReposts((prev) => (reposted ? prev - 1 : prev + 1));
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const toggleSave = async () => {
+    try {
+      if (!token) {
+        alert("Please log in to save posts");
+        return;
+      }
+      const res = await fetch(`http://localhost:5000/api/forums/${post._id}/save`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to toggle save");
+      }
+      setSaved((prev) => !prev);
+    } catch (err) {
+      console.error("Save error:", err);
+      alert(err.message || "Failed to save post");
     }
   };
 
@@ -131,7 +176,17 @@ const PostCard = ({ post, viewType }) => {
             <span className="font-semibold text-card-foreground">
               Forum
             </span>{" "}
-            • Posted by {post.user?.name} • {timeAgo(post.createdAt)}
+            • Posted by{" "}
+            <span 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/profile/${post.user?._id}`);
+              }}
+              className="font-semibold text-primary hover:underline cursor-pointer"
+            >
+              {post.user?.name}
+            </span>{" "}
+            • {timeAgo(post.createdAt)}
           </div>
 
           {/* TITLE - assuming no title, use content as title or something */}
@@ -285,6 +340,16 @@ const PostCard = ({ post, viewType }) => {
             >
               <Repeat2 size={14} />
               {reposts} reposts
+            </button>
+
+            <button
+              onClick={toggleSave}
+              className={`flex items-center gap-1 hover:text-foreground ${
+                saved ? "text-blue-500" : ""
+              }`}
+            >
+              <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
+              {saved ? "Saved" : "Save"}
             </button>
 
             <button

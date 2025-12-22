@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import PostCard from "@/components/forum/PostCard";
 
-const ProfileLikedPosts = ({ user }) => {
+const ProfileReposts = ({ user }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLikedPosts = async () => {
+    const fetchUserReposts = async () => {
       try {
         const token = user?.token || JSON.parse(localStorage.getItem("user"))?.token;
         if (!token) return;
 
-        const response = await fetch("http://localhost:5000/api/forums/user/liked", {
+        const response = await fetch("http://localhost:5000/api/forums/user/reposts", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -22,20 +22,20 @@ const ProfileLikedPosts = ({ user }) => {
           setPosts(data);
         }
       } catch (error) {
-        console.error("Error fetching liked posts:", error);
+        console.error("Error fetching user reposts:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLikedPosts();
+    fetchUserReposts();
   }, [user]);
 
   if (loading) {
     return (
       <div className="space-y-4">
         <div className="bg-card rounded-xl border p-6 text-center">
-          <p className="text-muted-foreground">Loading liked posts...</p>
+          <p className="text-muted-foreground">Loading reposted posts...</p>
         </div>
       </div>
     );
@@ -45,7 +45,7 @@ const ProfileLikedPosts = ({ user }) => {
     return (
       <div className="space-y-4">
         <div className="bg-card rounded-xl border p-6 text-center">
-          <p className="text-muted-foreground">No liked posts yet.</p>
+          <p className="text-muted-foreground">No reposted posts yet.</p>
         </div>
       </div>
     );
@@ -60,4 +60,4 @@ const ProfileLikedPosts = ({ user }) => {
   );
 };
 
-export default ProfileLikedPosts;
+export default ProfileReposts;

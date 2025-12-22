@@ -36,13 +36,14 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
       const formData = new FormData();
 
       formData.append("content", content.trim());
       formData.append("links", JSON.stringify(links));
 
-      const res = await fetch(`http://localhost:5000/api/forum/${post._id}`, {
+      const res = await fetch(`http://localhost:5000/api/forums/${post._id}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -13,13 +13,34 @@ const userSchema = mongoose.Schema(
     section: String,
     courses: [String],
     role: { type: String, default: "student" },
+    
+    // Profile fields
+    profilePicture: { type: String, default: "" },
+    bio: { type: String, default: "", maxlength: 500 },
+    headline: { type: String, default: "", maxlength: 120 },
+    location: { type: String, default: "" },
+    website: { type: String, default: "" },
+    socialLinks: {
+      linkedin: { type: String, default: "" },
+      github: { type: String, default: "" },
+      twitter: { type: String, default: "" }
+    },
+    
+    // Connections and social features
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    connectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    
+    favoriteDocuments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }],
+    savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "ForumPost" }],
   },
   { timestamps: true }
 );
 
 // Encrypt password before saving
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) {
+    return next();
+  }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();

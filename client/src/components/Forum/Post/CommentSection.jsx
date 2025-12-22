@@ -8,8 +8,9 @@ const CommentSection = ({ postId }) => {
 
   const fetchComments = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/forum/${postId}/comments`, {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+      const res = await fetch(`http://localhost:5000/api/forums/${postId}/comments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

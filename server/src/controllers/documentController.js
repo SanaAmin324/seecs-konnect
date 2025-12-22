@@ -1,10 +1,11 @@
 const Document = require("../models/Document");
 const User = require("../models/User");
+const asyncHandler = require("express-async-handler");
 const fs = require("fs");
 const path = require("path");
 
 // Upload document (multiple files)
-const uploadDocument = async (req, res) => {
+const uploadDocument = asyncHandler(async (req, res) => {
   try {
     if (!req.files || req.files.length === 0)
       return res.status(400).json({ message: "At least one file is required" });
@@ -43,10 +44,10 @@ const uploadDocument = async (req, res) => {
     console.error("Upload error:", err);
     res.status(500).json({ message: "Failed to upload document" });
   }
-};
+});
 
 // Get documents (pagination)
-const getDocuments = async (req, res) => {
+const getDocuments = asyncHandler(async (req, res) => {
   const { user, page = 1, limit = 10 } = req.query;
   const filter = user ? { uploader: user } : {};
   const skip = (page - 1) * limit;
@@ -66,10 +67,10 @@ const getDocuments = async (req, res) => {
     totalDocs,
     totalPages: Math.ceil(totalDocs / limit),
   });
-};
+});
 
 // Download a specific file from the document
-const downloadDocument = async (req, res) => {
+const downloadDocument = asyncHandler(async (req, res) => {
   try {
     const { id, fileIndex } = req.params; // fileIndex = which file to download
     const doc = await Document.findById(id);
@@ -91,10 +92,10 @@ const downloadDocument = async (req, res) => {
     console.error("Download error:", err);
     res.status(500).json({ message: "Failed to download file" });
   }
-};
+});
 
 // Delete document + all files
-const deleteDocument = async (req, res) => {
+const deleteDocument = asyncHandler(async (req, res) => {
   try {
     const doc = await Document.findById(req.params.id);
     if (!doc) return res.status(404).json({ message: "Document not found" });
@@ -117,10 +118,10 @@ const deleteDocument = async (req, res) => {
     console.error("Delete error:", err);
     res.status(500).json({ message: "Failed to delete document" });
   }
-};
+});
 
 // Search documents
-const searchDocuments = async (req, res) => {
+const searchDocuments = asyncHandler(async (req, res) => {
   const { title, course, category, className, academicYear, uploaderName, page = 1, limit = 10 } =
     req.query;
 
@@ -155,7 +156,72 @@ const searchDocuments = async (req, res) => {
     totalDocs,
     totalPages: Math.ceil(totalDocs / limit),
   });
-};
+});
+
+// Toggle favorite document
+const toggleFavoriteDocument = asyncHandler(async (req, res) => {
+  try {
+    const { documentId } = req.params;
+    const userId = req.user._id;
+
+    console.log("Toggle favorite - Document ID:", documentId);
+    console.log("Toggle favorite - User ID:", userId);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      console.log("User not found:", userId);
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const document = await Document.findById(documentId);
+    if (!document) {
+      console.log("Document not found:", documentId);
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    console.log("Current favorites:", user.favoriteDocuments);
+    const isFavorited = user.favoriteDocuments.includes(documentId);
+    console.log("Is favorited:", isFavorited);
+
+    if (isFavorited) {
+      user.favoriteDocuments.pull(documentId);
+      await user.save();
+      console.log("Document removed from favorites");
+      return res.json({ message: "Document removed from favorites", isFavorited: false });
+    } else {
+      user.favoriteDocuments.push(documentId);
+      await user.save();
+      console.log("Document added to favorites");
+      return res.json({ message: "Document added to favorites", isFavorited: true });
+    }
+  } catch (err) {
+    console.error("Toggle favorite error:", err);
+    console.error("Error stack:", err.stack);
+    res.status(500).json({ message: "Failed to toggle favorite", error: err.message });
+  }
+});
+
+// Get user's favorite documents
+const getFavoriteDocuments = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).populate({
+      path: "favoriteDocuments",
+      populate: {
+        path: "uploader",
+        select: "name email program batch",
+      },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ documents: user.favoriteDocuments || [] });
+  } catch (err) {
+    console.error("Get favorites error:", err);
+    res.status(500).json({ message: "Failed to get favorite documents" });
+  }
+});
 
 module.exports = {
   uploadDocument,
@@ -163,4 +229,6 @@ module.exports = {
   downloadDocument,
   deleteDocument,
   searchDocuments,
+  toggleFavoriteDocument,
+  getFavoriteDocuments,
 };

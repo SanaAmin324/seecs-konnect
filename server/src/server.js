@@ -29,9 +29,10 @@ app.use('/uploads', express.static('uploads', {
 // Routes
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/documents", require("./routes/documentRoutes"));
-app.use('/api/forum', require('./routes/forumRoutes'));
+app.use('/api/forums', require('./routes/forumRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
+app.use("/api/profile", require("./routes/profileRoutes"));
 
 
 

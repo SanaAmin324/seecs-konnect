@@ -6,7 +6,20 @@ export function useAuth() {
   const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        // Ensure the user object has _id field
+        if (parsed && !parsed._id && parsed.id) {
+          parsed._id = parsed.id;
+        }
+        return parsed;
+      } catch (err) {
+        console.error("Error parsing user from localStorage:", err);
+        return null;
+      }
+    }
+    return null;
   });
 
   useEffect(() => {

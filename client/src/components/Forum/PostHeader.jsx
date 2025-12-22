@@ -1,12 +1,28 @@
-const PostHeader = ({ author, createdAt }) => {
-    return (
-      <div className="flex items-center gap-2 text-sm text-gray-600">
-        <span className="font-semibold text-black">{author}</span>
-        <span>•</span>
-        <span>{createdAt}</span>
-      </div>
-    );
+import { useNavigate } from "react-router-dom";
+
+const PostHeader = ({ author, createdAt, userId }) => {
+  const navigate = useNavigate();
+
+  const handleAuthorClick = (e) => {
+    e.stopPropagation(); // Prevent triggering parent click events
+    if (userId) {
+      navigate(`/profile/${userId}`);
+    }
   };
-  
-  export default PostHeader;
+
+  return (
+    <div className="flex items-center gap-2 text-sm text-gray-600">
+      <span 
+        onClick={handleAuthorClick}
+        className="font-semibold text-black hover:text-primary cursor-pointer transition"
+      >
+        {author}
+      </span>
+      <span>•</span>
+      <span>{createdAt}</span>
+    </div>
+  );
+};
+
+export default PostHeader;
   

@@ -369,6 +369,126 @@ const removeMediaFromPost = asyncHandler(async (req, res) => {
   res.json({ message: "Media removed successfully" });
 });
 
+// -----------------------------------------------------
+// GET USER'S POSTS
+// -----------------------------------------------------
+const getUserPosts = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  
+  const posts = await ForumPost.find({ user: userId })
+    .populate("user", "name email cms program")
+    .populate("likes", "name")
+    .populate("reposts", "name")
+    .sort({ createdAt: -1 });
+
+  res.json(posts);
+});
+
+// -----------------------------------------------------
+// GET USER'S REPOSTED POSTS
+// -----------------------------------------------------
+const getUserReposts = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  
+  const posts = await ForumPost.find({ reposts: userId })
+    .populate("user", "name email cms program")
+    .populate("likes", "name")
+    .populate("reposts", "name")
+    .sort({ createdAt: -1 });
+
+  res.json(posts);
+});
+
+// -----------------------------------------------------
+// GET USER'S LIKED POSTS
+// -----------------------------------------------------
+const getUserLikedPosts = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  
+  const posts = await ForumPost.find({ likes: userId })
+    .populate("user", "name email cms program")
+    .populate("likes", "name")
+    .populate("reposts", "name")
+    .sort({ createdAt: -1 });
+
+  res.json(posts);
+});
+
+// -----------------------------------------------------
+// GET USER'S COMMENTS
+// -----------------------------------------------------
+const getUserComments = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  
+  const comments = await Comment.find({ user: userId })
+    .populate("user", "name email cms program")
+    .populate({
+      path: "post",
+      select: "content user createdAt",
+      populate: {
+        path: "user",
+        select: "name"
+      }
+    })
+    .sort({ createdAt: -1 });
+
+  res.json(comments);
+});
+
+// -----------------------------------------------------
+// TOGGLE SAVE POST
+// -----------------------------------------------------
+const toggleSavePost = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const userId = req.user._id;
+  const User = require("../models/User");
+
+  if (!mongoose.isValidObjectId(postId)) {
+    res.status(400);
+    throw new Error("Invalid post id");
+  }
+
+  const post = await ForumPost.findById(postId);
+  if (!post) return res.status(404).json({ message: "Post not found" });
+
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const isSaved = user.savedPosts.includes(postId);
+
+  if (isSaved) {
+    user.savedPosts.pull(postId);
+    await user.save();
+    return res.json({ message: "Post unsaved", isSaved: false });
+  } else {
+    user.savedPosts.push(postId);
+    await user.save();
+    return res.json({ message: "Post saved", isSaved: true });
+  }
+});
+
+// -----------------------------------------------------
+// GET USER'S SAVED POSTS
+// -----------------------------------------------------
+const getUserSavedPosts = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const User = require("../models/User");
+
+  const user = await User.findById(userId).populate({
+    path: "savedPosts",
+    populate: [
+      { path: "user", select: "name email cms program" },
+      { path: "likes", select: "name" },
+      { path: "reposts", select: "name" }
+    ],
+    options: { sort: { createdAt: -1 } }
+  });
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  res.json(user.savedPosts || []);
+});
+
 module.exports = {
   createPost,
   getAllPosts,
@@ -381,4 +501,10 @@ module.exports = {
   getComments,
   editPost,
   removeMediaFromPost,
+  getUserPosts,
+  getUserReposts,
+  getUserLikedPosts,
+  getUserComments,
+  toggleSavePost,
+  getUserSavedPosts,
 };

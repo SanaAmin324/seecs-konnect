@@ -16,8 +16,9 @@ const ForumPost = () => {
 
   const fetchPost = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/forum/${postId}`, {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+      const res = await fetch(`http://localhost:5000/api/forums/${postId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

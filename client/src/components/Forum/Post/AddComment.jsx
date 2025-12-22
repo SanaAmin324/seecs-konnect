@@ -15,8 +15,9 @@ const AddComment = ({ postId, onCommentAdded }) => {
     setError(null);
     
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/forum/${postId}/comment`, {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+      const res = await fetch(`http://localhost:5000/api/forums/${postId}/comment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

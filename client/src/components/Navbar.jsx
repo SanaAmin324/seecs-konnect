@@ -20,6 +20,7 @@ export default function Navbar() {
 
   const [userName, setUserName] = useState(null);
   const [username, setUsername] = useState(null); // ✅ FIX ADDED
+  const [profilePicture, setProfilePicture] = useState(null);
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -46,8 +47,28 @@ export default function Navbar() {
         parsed?.data?.username ||
         null;
 
+      const userId = parsed?._id || parsed?.user?._id || parsed?.data?._id;
+
       if (name) setUserName(name);
       if (uname) setUsername(uname);
+
+      // Fetch full profile to get profile picture
+      if (userId && parsed?.token) {
+        fetch(`http://localhost:5000/api/profile/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${parsed.token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.profilePicture) {
+              setProfilePicture(data.profilePicture);
+            }
+          })
+          .catch(() => {
+            // ignore errors
+          });
+      }
     } catch {
       // ignore
     }
@@ -146,8 +167,10 @@ export default function Navbar() {
             className="rounded-full p-2 hover:bg-primary/20"
           >
             <Avatar className="w-8 h-8 border border-border">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>SC</AvatarFallback>
+              {profilePicture ? (
+                <AvatarImage src={`http://localhost:5000${profilePicture}`} alt={userName || "User"} />
+              ) : null}
+              <AvatarFallback>{userName?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
             </Avatar>
           </Button>
         </Link>

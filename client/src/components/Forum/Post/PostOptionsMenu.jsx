@@ -18,8 +18,9 @@ const PostOptionsMenu = ({ post, currentUserId, isAdmin, onPostDeleted, onPostEd
 
     setIsDeleting(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/forum/${post._id}`, {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+      const res = await fetch(`http://localhost:5000/api/forums/${post._id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

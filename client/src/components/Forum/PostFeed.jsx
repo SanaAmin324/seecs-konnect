@@ -15,20 +15,24 @@ const PostFeed = ({ sortType, setSortType }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login", { state: { from: location.pathname } });
-        return;
-      }
       try {
-        const res = await fetch("http://localhost:5000/api/forum", {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const token = user?.token;
+        
+        if (!token) {
+          navigate("/login", { state: { from: location.pathname } });
+          return;
+        }
+
+        const res = await fetch("http://localhost:5000/api/forums", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        
         if (!res.ok) {
           if (res.status === 401) {
-            localStorage.removeItem("token");
+            localStorage.removeItem("user");
             navigate("/login", { state: { from: location.pathname } });
             return;
           }
@@ -37,13 +41,14 @@ const PostFeed = ({ sortType, setSortType }) => {
         const data = await res.json();
         setPosts(data);
       } catch (err) {
+        console.error("Error fetching posts:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
     fetchPosts();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const sortedPosts =
     sortType === "recent"

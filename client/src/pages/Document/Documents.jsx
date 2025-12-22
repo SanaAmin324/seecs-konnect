@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, FileText, Search } from "lucide-react";
+import { Upload, FileText, Search, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 
@@ -18,6 +18,7 @@ const Documents = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
+  const [favorites, setFavorites] = useState(new Set());
   
 
   const recentUploads = [];
@@ -68,7 +69,77 @@ const Documents = () => {
 
   useEffect(() => {
     fetchDocuments({ page: 1, limit: 6 });
+    fetchUserFavorites();
   }, []);
+
+  const fetchUserFavorites = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      const token = user?.token;
+      if (!token) return;
+
+      const res = await fetch("http://localhost:5000/api/documents/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        const favoriteIds = new Set(data.documents.map(doc => doc._id));
+        setFavorites(favoriteIds);
+      }
+    } catch (err) {
+      console.error("Failed to fetch favorites", err);
+    }
+  };
+
+  const toggleFavorite = async (docId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      const token = user?.token;
+      
+      console.log("Toggle favorite clicked for doc:", docId);
+      console.log("Token exists:", !!token);
+      console.log("User object:", user);
+      
+      if (!token) {
+        alert("You must be logged in to favorite documents.");
+        return;
+      }
+
+      const res = await fetch(`http://localhost:5000/api/documents/${docId}/favorite`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` 
+        },
+      });
+
+      console.log("Response status:", res.status);
+      const responseText = await res.text();
+      console.log("Response text:", responseText);
+
+      if (res.ok) {
+        const data = JSON.parse(responseText);
+        console.log("Response data:", data);
+        setFavorites(prev => {
+          const newFavorites = new Set(prev);
+          if (data.isFavorited) {
+            newFavorites.add(docId);
+          } else {
+            newFavorites.delete(docId);
+          }
+          return newFavorites;
+        });
+      } else {
+        console.error("Failed to toggle favorite:", res.status, responseText);
+        const errorData = JSON.parse(responseText);
+        alert(`Failed to toggle favorite: ${errorData.message || responseText}${errorData.error ? '\n' + errorData.error : ''}`);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
+      alert(`Error: ${err.message}`);
+    }
+  };
 
   return (
     <MainLayout>
@@ -152,6 +223,24 @@ const Documents = () => {
                       </div>
                     </CardContent>
                     <div className="px-6 pb-6 flex gap-2">
+                      <button 
+                        className={`px-3 py-1 rounded flex items-center gap-1 transition-colors ${
+                          favorites.has(doc.id) 
+                            ? 'bg-red-500 text-white hover:bg-red-600' 
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleFavorite(doc.id);
+                        }}
+                      >
+                        <Heart 
+                          className="w-4 h-4" 
+                          fill={favorites.has(doc.id) ? "currentColor" : "none"}
+                        />
+                        {favorites.has(doc.id) ? "Favorited" : "Favorite"}
+                      </button>
+
                       <button className="px-3 py-1 rounded bg-primary text-white" onClick={async (e) => {
                         e.preventDefault();
                         try {
