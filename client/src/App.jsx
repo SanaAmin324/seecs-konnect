@@ -25,6 +25,8 @@ import CreatePost from "./pages/Forum/CreatePost";
 /* User */
 import UserProfile from "@/pages/UserProfile";
 
+import Settings from "@/pages/Settings/Settings";
+
 /* Admin */
 import ReportsDashboard from "./pages/Admin/ReportsDashboard";
 
@@ -126,6 +128,15 @@ export default function App() {
           element={
             <ProtectedRoute requireAdmin={true}>
               <ReportsDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />

@@ -1,6 +1,7 @@
 const tabs = [
   { id: "overview", label: "Overview" },
   { id: "posts", label: "Posts" },
+  { id: "reposts", label: "Reposted Posts" },
   { id: "comments", label: "Comments" },
   { id: "favourites", label: "Favourite Documents" },
   { id: "saved", label: "Saved Posts" },

@@ -3,6 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 import PostFeed from "@/components/forum/PostFeed";
 import RecentlyViewed from "@/components/forum/RecentlyViewed";
 import CreatePostButton from "../../components/forum/CreatePostButton";
+import { useSearchParams } from "react-router-dom";
 
 
 const Forum = () => {
