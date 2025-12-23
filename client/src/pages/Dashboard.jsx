@@ -1,44 +1,27 @@
-import { Card, CardContent } from "@/components/ui/card";
 import MainLayout from "@/layouts/MainLayout";
-import { useAuth } from "@/hooks/useAuth";
+import RecentDocumentsCard from "../components/Dashboard/RecentDocumentsCard";
+import RecentForumPostsCard from "../components/Dashboard/RecentForumPostsCard";
+import UserStatsCard from "../components/Dashboard/UserStatsCard";
+import EventsCard from "../components/Dashboard/EventsCard";
 
-const Dashboard = () => {
-  const { user } = useAuth();
-
-  if (!user) return null;
-
+export default function Dashboard() {
   return (
     <MainLayout>
-      <h1 className="text-3xl font-bold mb-6">
-        Dashboard — Welcome {user.name}
-      </h1>
+      <div className="min-h-screen bg-muted/40 p-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Left */}
+          <RecentDocumentsCard />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="shadow-sm bg-card text-card-foreground">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold">Welcome</h2>
-            <p className="mt-2 text-muted-foreground">
-              You are logged in as <strong>{user.role}</strong>.
-            </p>
-          </CardContent>
-        </Card>
+          {/* Top Right */}
+          <UserStatsCard />
 
-        <Card className="shadow-sm bg-card text-card-foreground">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold">Students</h2>
-            <p className="mt-2 text-muted-foreground">Manage or view students.</p>
-          </CardContent>
-        </Card>
+          {/* Bottom Left */}
+          <RecentForumPostsCard />
 
-        <Card className="shadow-sm bg-card text-card-foreground">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold">Resources</h2>
-            <p className="mt-2 text-muted-foreground">Access shared materials.</p>
-          </CardContent>
-        </Card>
+          {/* Bottom Right */}
+          <EventsCard />
+        </div>
       </div>
     </MainLayout>
   );
-};
-
-export default Dashboard;
+}

@@ -97,7 +97,8 @@ export default function Navbar() {
               className="flex-1 px-4 py-2 bg-card focus:outline-none"
             />
 
-            <div className="flex">
+            {/* Desktop: show quick filter buttons; Mobile: compact select */}
+            <div className="hidden sm:flex">
               <Button variant="ghost" size="sm">
                 Accounts
               </Button>
@@ -107,6 +108,23 @@ export default function Navbar() {
               <Button variant="ghost" size="sm">
                 Documents
               </Button>
+            </div>
+
+            <div className="sm:hidden flex items-center px-2">
+              <select
+                aria-label="Quick filter"
+                className="bg-transparent border-none text-sm focus:outline-none"
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === "Accounts") navigate("/accounts");
+                  if (v === "Forum") navigate("/forums");
+                  if (v === "Documents") navigate("/documents");
+                }}
+              >
+                <option>Accounts</option>
+                <option>Forum</option>
+                <option>Documents</option>
+              </select>
             </div>
 
             <Button size="sm" className="rounded-r-xl">

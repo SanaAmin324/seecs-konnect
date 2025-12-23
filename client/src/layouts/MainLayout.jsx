@@ -9,7 +9,6 @@ export default function MainLayout({ children }) {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background text-foreground overflow-hidden">
         {/* Sidebar */}
-        <div className="hidden md:flex"></div>
         <AppSidebar />
 
         {/* Main content */}
