@@ -5,19 +5,9 @@ const ProfileAboutCard = ({ user }) => {
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 space-y-4 sticky top-6">
-      <h3 className="font-bold text-lg text-foreground">About</h3>
+      <h3 className="font-bold text-lg text-foreground">Academic Info</h3>
       
       <div className="space-y-3 text-sm">
-        <div>
-          <p className="text-muted-foreground text-xs uppercase tracking-wide font-semibold mb-1">Name</p>
-          <p className="text-foreground font-medium">{user?.name || 'N/A'}</p>
-        </div>
-        
-        <div>
-          <p className="text-muted-foreground text-xs uppercase tracking-wide font-semibold mb-1">Email</p>
-          <p className="text-foreground font-medium break-all">{user?.email || 'N/A'}</p>
-        </div>
-
         {user?.cms && (
           <div>
             <p className="text-muted-foreground text-xs uppercase tracking-wide font-semibold mb-1">CMS ID</p>
@@ -45,17 +35,15 @@ const ProfileAboutCard = ({ user }) => {
             <p className="text-foreground font-medium">{user.section}</p>
           </div>
         )}
+
+        {(user?.cms || user?.program || user?.batch || user?.section) && (
+          <div className="pt-2 border-t border-border" />
+        )}
         
-        <div className="pt-2 border-t border-border">
+        <div>
           <p className="text-muted-foreground text-xs uppercase tracking-wide font-semibold mb-1">Member Since</p>
           <p className="text-foreground font-medium">{joinDate}</p>
         </div>
-
-        {user?.role === 'admin' && (
-          <div className="pt-2 border-t border-border">
-            <span className="inline-block px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-full">Administrator</span>
-          </div>
-        )}
       </div>
     </div>
   );

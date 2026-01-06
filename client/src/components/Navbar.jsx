@@ -21,6 +21,7 @@ export default function Navbar() {
   const [userName, setUserName] = useState(null);
   const [username, setUsername] = useState(null); // ✅ FIX ADDED
   const [profilePicture, setProfilePicture] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -30,6 +31,14 @@ export default function Navbar() {
   const isDocuments = pathname.startsWith("/documents");
   const isForums = pathname.startsWith("/forums");
   const isForumPage = pathname.startsWith("/forums");
+  const isNotificationsPage = pathname === "/notifications";
+
+  // Immediately set count to 0 when on notifications page
+  useEffect(() => {
+    if (isNotificationsPage) {
+      setUnreadCount(0);
+    }
+  }, [isNotificationsPage]);
 
 
   useEffect(() => {
@@ -68,11 +77,55 @@ export default function Navbar() {
           .catch(() => {
             // ignore errors
           });
+
+        // Function to fetch unread notification count
+        const fetchUnreadCount = () => {
+          fetch(`http://localhost:5000/api/notifications/unread-count`, {
+            headers: {
+              Authorization: `Bearer ${parsed.token}`,
+            },
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log("Unread count from API:", data.unreadCount);
+              setUnreadCount(data.unreadCount || 0);
+            })
+            .catch((err) => {
+              console.error("Error fetching unread count:", err);
+            });
+        };
+
+        // Fetch immediately
+        fetchUnreadCount();
+
+        // Poll every 3 seconds when on notifications page, every 15 seconds otherwise
+        const pollInterval = isNotificationsPage ? 3000 : 15000;
+        const intervalId = setInterval(fetchUnreadCount, pollInterval);
+
+        // Listen for notifications page view event to refresh immediately
+        const handleNotificationsViewed = () => {
+          console.log('Received notificationsViewed event, fetching count...');
+          // Fetch immediately without delay to update counter
+          fetchUnreadCount();
+        };
+        window.addEventListener('notificationsViewed', handleNotificationsViewed);
+
+        // If we're on the notifications page, set count to 0 immediately
+        if (isNotificationsPage) {
+          console.log('On notifications page, setting count to 0');
+          setUnreadCount(0);
+        }
+
+        // Cleanup interval on unmount
+        return () => {
+          clearInterval(intervalId);
+          window.removeEventListener('notificationsViewed', handleNotificationsViewed);
+        };
       }
     } catch {
       // ignore
     }
-  }, []);
+  }, [isNotificationsPage]); // Re-run when entering/leaving notifications page
 
   const profileUrl = username
     ? `/u/${username}`
@@ -162,12 +215,19 @@ export default function Navbar() {
           )}
         </Button>
 
-        <Button
-          variant="ghost"
-          className="rounded-full p-2 hover:bg-primary/20"
-        >
-          <Bell className="w-5 h-5 text-foreground" />
-        </Button>
+        <Link to="/notifications">
+          <Button
+            variant="ghost"
+            className="rounded-full p-2 hover:bg-primary/20 relative"
+          >
+            <Bell className="w-5 h-5 text-foreground" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </Button>
+        </Link>
 
         {isForums && (
           <Button

@@ -99,7 +99,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 // LIKE / UNLIKE POST
 // -----------------------------------------------------
 const toggleLike = asyncHandler(async (req, res) => {
-  const post = await ForumPost.findById(req.params.id);
+  const post = await ForumPost.findById(req.params.id).populate('user', 'name');
   if (!post) return res.status(404).json({ message: "Post not found" });
 
   const userId = req.user._id;
@@ -107,11 +107,32 @@ const toggleLike = asyncHandler(async (req, res) => {
   if (post.likes.includes(userId)) {
     post.likes.pull(userId);
     await post.save();
+    
+    // Delete notification when unliked
+    await Notification.deleteOne({
+      user: post.user._id,
+      from: userId,
+      type: 'post_like',
+      post: post._id
+    });
+    
     return res.json({ message: "Unliked post" });
   }
 
   post.likes.push(userId);
   await post.save();
+  
+  // Create notification for post owner (don't notify yourself)
+  if (post.user._id.toString() !== userId.toString()) {
+    await Notification.create({
+      user: post.user._id,
+      type: 'post_like',
+      from: userId,
+      post: post._id,
+      message: `${req.user.name} liked your post`
+    });
+  }
+  
   res.json({ message: "Liked post" });
 });
 
@@ -119,7 +140,7 @@ const toggleLike = asyncHandler(async (req, res) => {
 // TOGGLE REPOST
 // -----------------------------------------------------
 const toggleRepost = asyncHandler(async (req, res) => {
-  const post = await ForumPost.findById(req.params.id);
+  const post = await ForumPost.findById(req.params.id).populate('user', 'name');
   if (!post) return res.status(404).json({ message: "Post not found" });
 
   const userId = req.user._id;
@@ -127,11 +148,32 @@ const toggleRepost = asyncHandler(async (req, res) => {
   if (post.reposts.includes(userId)) {
     post.reposts.pull(userId);
     await post.save();
+    
+    // Delete notification when unreposted
+    await Notification.deleteOne({
+      user: post.user._id,
+      from: userId,
+      type: 'post_repost',
+      post: post._id
+    });
+    
     return res.json({ message: "Unreposted post" });
   }
 
   post.reposts.push(userId);
   await post.save();
+  
+  // Create notification for post owner (don't notify yourself)
+  if (post.user._id.toString() !== userId.toString()) {
+    await Notification.create({
+      user: post.user._id,
+      type: 'post_repost',
+      from: userId,
+      post: post._id,
+      message: `${req.user.name} reposted your post`
+    });
+  }
+  
   res.json({ message: "Reposted post" });
 });
 
@@ -225,7 +267,7 @@ const addComment = asyncHandler(async (req, res) => {
     throw new Error("Invalid post id");
   }
 
-  const post = await ForumPost.findById(postId);
+  const post = await ForumPost.findById(postId).populate('user', 'name');
   if (!post) return res.status(404).json({ message: "Post not found" });
 
   const comment = await Comment.create({
@@ -237,6 +279,17 @@ const addComment = asyncHandler(async (req, res) => {
 
   post.commentCount += 1;
   await post.save();
+  
+  // Create notification for post owner (don't notify yourself)
+  if (post.user._id.toString() !== userId.toString()) {
+    await Notification.create({
+      user: post.user._id,
+      type: 'post_comment',
+      from: userId,
+      post: post._id,
+      message: `${req.user.name} commented on your post`
+    });
+  }
 
   res.status(201).json(comment);
 });

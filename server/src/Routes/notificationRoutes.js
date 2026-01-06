@@ -16,10 +16,10 @@ router.get("/", protect, getNotifications);
 // Get unread count
 router.get("/unread-count", protect, getUnreadCount);
 
+// Mark all notifications as read (MUST come before /:id routes)
+router.patch("/mark-all", protect, markAllAsRead);
+
 // Mark one notification as read
 router.patch("/:id/read", protect, markAsRead);
-
-// Mark all notifications as read
-router.patch("/mark-all", protect, markAllAsRead);
 
 module.exports = router;

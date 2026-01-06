@@ -23,6 +23,8 @@ const Settings = () => {
   });
   const [profilePicture, setProfilePicture] = useState("");
   const [previewImage, setPreviewImage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [shouldRemovePicture, setShouldRemovePicture] = useState(false);
 
   useEffect(() => {
     fetchUserProfile();
@@ -74,9 +76,25 @@ const Settings = () => {
     }
   };
 
-  const handleProfilePictureChange = async (e) => {
+  const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setMessage("Please select a valid image file (JPG, PNG, GIF, or WEBP)");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("Image size must be less than 5MB");
+      return;
+    }
+
+    // Store file for later upload
+    setSelectedFile(file);
 
     // Preview image
     const reader = new FileReader();
@@ -84,37 +102,17 @@ const Settings = () => {
       setPreviewImage(reader.result);
     };
     reader.readAsDataURL(file);
+    
+    setMessage("");
+  };
 
-    // Upload image
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("profilePicture", file);
-
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const response = await fetch("http://localhost:5000/api/profile/upload-picture", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setProfilePicture(data.profilePicture);
-        setMessage("Profile picture updated successfully!");
-        setTimeout(() => setMessage(""), 3000);
-      } else {
-        const error = await response.json();
-        setMessage(error.message || "Failed to upload profile picture");
-      }
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
-      setMessage("Failed to upload profile picture");
-    } finally {
-      setUploading(false);
-    }
+  const handleRemoveProfilePicture = () => {
+    // Mark for removal and clear previews
+    setShouldRemovePicture(true);
+    setPreviewImage("");
+    setSelectedFile(null);
+    setMessage("Profile picture will be removed when you save changes");
+    setTimeout(() => setMessage(""), 3000);
   };
 
   const handleSubmit = async (e) => {
@@ -124,6 +122,63 @@ const Settings = () => {
 
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      
+      // Handle profile picture removal first if requested
+      if (shouldRemovePicture) {
+        const removeResponse = await fetch("http://localhost:5000/api/profile/remove-picture", {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (removeResponse.ok) {
+          setProfilePicture("");
+          setShouldRemovePicture(false);
+          
+          // Update localStorage
+          const updatedUser = { ...user, profilePicture: "" };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        } else {
+          const error = await removeResponse.json();
+          setMessage(error.message || "Failed to remove profile picture");
+          setLoading(false);
+          return;
+        }
+      }
+      // Upload profile picture if a new one was selected
+      else if (selectedFile) {
+        const formData = new FormData();
+        formData.append("profilePicture", selectedFile);
+
+        const uploadResponse = await fetch("http://localhost:5000/api/profile/upload-picture", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: formData,
+        });
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          setProfilePicture(uploadData.profilePicture);
+          
+          // Update localStorage with new profile picture
+          const updatedUser = { ...user, profilePicture: uploadData.profilePicture };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          
+          // Clear selected file and preview
+          setSelectedFile(null);
+          setPreviewImage("");
+        } else {
+          const error = await uploadResponse.json();
+          setMessage(error.message || "Failed to upload profile picture");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Update profile data
       const response = await fetch("http://localhost:5000/api/profile/update", {
         method: "PUT",
         headers: {
@@ -181,7 +236,7 @@ const Settings = () => {
           <div className="flex items-center gap-6">
             <div className="relative">
               <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                {previewImage || profilePicture ? (
+                {!shouldRemovePicture && (previewImage || profilePicture) ? (
                   <img
                     src={
                       previewImage || `http://localhost:5000${profilePicture}`
@@ -190,7 +245,7 @@ const Settings = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-4xl text-gray-400">
+                  <span className="text-4xl text-muted-foreground">
                     {JSON.parse(localStorage.getItem("user"))?.name?.charAt(0) || "U"}
                   </span>
                 )}
@@ -210,9 +265,30 @@ const Settings = () => {
                 disabled={uploading}
               />
             </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-2">Accepted formats: JPG, PNG, GIF, WEBP</p>
-              <p className="text-sm text-gray-600">Maximum size: 5MB</p>
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground mb-2">Accepted formats: JPG, PNG, GIF, WEBP</p>
+              <p className="text-sm text-muted-foreground mb-4">Maximum size: 5MB</p>
+              {(profilePicture || previewImage) && !shouldRemovePicture && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleRemoveProfilePicture}
+                  disabled={uploading}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  Remove Photo
+                </Button>
+              )}
+              {shouldRemovePicture && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShouldRemovePicture(false)}
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                >
+                  Undo Remove
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -246,7 +322,7 @@ const Settings = () => {
                 onChange={handleInputChange}
                 maxLength={120}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {profileData.headline.length}/120 characters
               </p>
             </div>
@@ -265,9 +341,9 @@ const Settings = () => {
                 onChange={handleInputChange}
                 maxLength={500}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-input text-foreground"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {profileData.bio.length}/500 characters
               </p>
             </div>

@@ -64,13 +64,13 @@ const ReportPostModal = ({ postId, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+      <div className="bg-card rounded-lg shadow-lg max-w-md w-full mx-4">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-lg font-semibold">Report This Post</h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded-full transition"
+            className="p-1 hover:bg-muted rounded-full transition"
           >
             <X size={20} />
           </button>
@@ -95,7 +95,7 @@ const ReportPostModal = ({ postId, onClose }) => {
                 {reasons.map((r) => (
                   <label
                     key={r.value}
-                    className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                    className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition"
                   >
                     <input
                       type="radio"
@@ -125,7 +125,7 @@ const ReportPostModal = ({ postId, onClose }) => {
               />
             </div>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Your report will be reviewed by our moderation team. We take all
               reports seriously.
             </p>
@@ -136,7 +136,7 @@ const ReportPostModal = ({ postId, onClose }) => {
               <span className="text-2xl">✓</span>
             </div>
             <h3 className="font-semibold text-green-700">Report Submitted</h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Thank you for helping keep our community safe. Our team will
               review your report shortly.
             </p>
@@ -149,7 +149,7 @@ const ReportPostModal = ({ postId, onClose }) => {
             <button
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-100 transition disabled:opacity-50"
+              className="px-4 py-2 border rounded-lg hover:bg-muted transition disabled:opacity-50"
             >
               Cancel
             </button>
@@ -167,7 +167,7 @@ const ReportPostModal = ({ postId, onClose }) => {
           <div className="flex justify-end p-6 border-t">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
+              className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition"
             >
               Close
             </button>

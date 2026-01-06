@@ -69,13 +69,13 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white">
+        <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-card">
           <h2 className="text-lg font-semibold">Edit Post</h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded-full transition"
+            className="p-1 hover:bg-muted rounded-full transition"
           >
             <X size={20} />
           </button>
@@ -125,7 +125,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
                 {links.map((link, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
+                    className="flex items-center justify-between bg-muted p-3 rounded-lg"
                   >
                     <a
                       href={link.url}
@@ -168,7 +168,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
                         alt="Post media"
                       />
                     )}
-                    <p className="text-xs text-gray-500 mt-1 text-center">
+                    <p className="text-xs text-muted-foreground mt-1 text-center">
                       {media.type}
                     </p>
                   </div>
@@ -177,7 +177,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
             </div>
           )}
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             💡 To add or remove media, delete this post and create a new one.
           </p>
         </div>

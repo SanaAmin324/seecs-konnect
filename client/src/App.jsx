@@ -25,6 +25,8 @@ import CreatePost from "./pages/Forum/CreatePost";
 /* User */
 import UserProfile from "@/pages/UserProfile";
 import Settings from "@/pages/Settings";
+import Connections from "@/pages/Connections";
+import Notifications from "@/pages/Notifications";
 
 /* Admin */
 import ReportsDashboard from "./pages/Admin/ReportsDashboard";
@@ -73,6 +75,33 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/connections"
+          element={
+            <ProtectedRoute>
+              <Connections />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/connections/:userId"
+          element={
+            <ProtectedRoute>
+              <Connections />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
             </ProtectedRoute>
           }
         />

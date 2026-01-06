@@ -7,6 +7,7 @@ const Notification = require("../models/Notification");
 // -----------------------------------------------------
 exports.getNotifications = asyncHandler(async (req, res) => {
   const notifications = await Notification.find({ user: req.user._id })
+    .populate('from', 'name username profilePicture')
     .sort({ createdAt: -1 });
 
   res.json(notifications);

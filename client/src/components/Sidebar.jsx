@@ -39,6 +39,7 @@ export function AppSidebar() {
   const [userProgram, setUserProgram] = useState("Computer Science 🎓");
   const [userRole, setUserRole] = useState("user");
   const [username, setUsername] = useState(null);
+  const [profilePicture, setProfilePicture] = useState("");
 
   // Fetch user info from localStorage and optionally backend
   useEffect(() => {
@@ -52,17 +53,19 @@ export function AppSidebar() {
         parsed?.program || parsed?.user?.program || parsed?.data?.program;
       const role = parsed?.role || parsed?.user?.role || parsed?.data?.role || "user";
       const uname = parsed?.username || parsed?._id || parsed?.user?.username || parsed?.data?.username || null;
+      const userId = parsed?._id || parsed?.user?._id || parsed?.data?._id;
+      const token = parsed?.token || parsed?.user?.token || parsed?.data?.token;
 
       if (name) setUserName(name);
       if (program) setUserProgram(program);
       if (role) setUserRole(role);
       if (uname) setUsername(uname);
 
-      const token = parsed?.token || parsed?.user?.token || parsed?.data?.token;
-      if (!program && token) {
+      // Always fetch fresh profile data to get latest profile picture
+      if (userId && token) {
         (async () => {
           try {
-            const res = await fetch("http://localhost:5000/api/users/profile", {
+            const res = await fetch(`http://localhost:5000/api/profile/${userId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
             if (!res.ok) return;
@@ -71,7 +74,12 @@ export function AppSidebar() {
             if (profile?.program) setUserProgram(profile.program);
             if (profile?.role) setUserRole(profile.role);
             if (profile?.username) setUsername(profile.username);
-          } catch (e) {}
+            if (profile?.profilePicture) {
+              setProfilePicture(profile.profilePicture);
+            }
+          } catch (e) {
+            console.error("Error fetching profile:", e);
+          }
         })();
       }
     } catch (e) {
@@ -121,6 +129,9 @@ export function AppSidebar() {
                     isCollapsed ? "w-10 h-10" : "w-12 h-12"
                   }`}
                 >
+                  {profilePicture ? (
+                    <AvatarImage src={`http://localhost:5000${profilePicture}`} alt={userName} />
+                  ) : null}
                   <AvatarFallback className="bg-gradient-to-br from-primary via-accent to-secondary text-white font-bold">
                     {userName?.charAt(0)?.toUpperCase() || '?'}
                   </AvatarFallback>

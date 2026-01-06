@@ -25,29 +25,33 @@ const UserProfile = () => {
 
   useEffect(() => {
     const fetchProfileUser = async () => {
-      if (isOwnProfile) {
-        setProfileUser(user);
-        setLoading(false);
-      } else {
-        try {
-          const authUser = JSON.parse(localStorage.getItem("user"));
-          const response = await fetch(`http://localhost:5000/api/profile/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${authUser.token}`,
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setProfileUser(data);
-          } else {
-            console.error("Failed to fetch user profile");
-          }
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        } finally {
+      try {
+        const authUser = JSON.parse(localStorage.getItem("user"));
+        
+        // Always fetch from API to get latest data, even for own profile
+        const targetUserId = userId || user?._id;
+        
+        if (!targetUserId) {
           setLoading(false);
+          return;
         }
+        
+        const response = await fetch(`http://localhost:5000/api/profile/${targetUserId}`, {
+          headers: {
+            Authorization: `Bearer ${authUser.token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setProfileUser(data);
+        } else {
+          console.error("Failed to fetch user profile");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
       }
     };
 

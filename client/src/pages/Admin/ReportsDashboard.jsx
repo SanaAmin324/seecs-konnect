@@ -98,13 +98,13 @@ const ReportsDashboard = () => {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "reviewed":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
       case "resolved":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
       case "dismissed":
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-muted-foreground";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-muted-foreground";
     }
   };
 
@@ -128,7 +128,7 @@ const ReportsDashboard = () => {
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Reports Dashboard</h1>
-          <p className="text-gray-600">Manage reported forum posts</p>
+          <p className="text-muted-foreground">Manage reported forum posts</p>
         </div>
 
         {/* Filter Tabs */}
@@ -139,13 +139,13 @@ const ReportsDashboard = () => {
               onClick={() => setFilterStatus(status)}
               className={`px-4 py-2 rounded-lg font-medium transition capitalize ${
                 filterStatus === status
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >
               {status}
               {filterStatus === status && reports.length > 0 && (
-                <span className="ml-2 bg-white text-blue-600 rounded-full px-2 py-0.5 text-sm">
+                <span className="ml-2 bg-background text-primary rounded-full px-2 py-0.5 text-sm">
                   {reports.length}
                 </span>
               )}
@@ -156,7 +156,7 @@ const ReportsDashboard = () => {
         {/* Reports List */}
         <div className="space-y-4">
           {loading && (
-            <div className="text-center py-8 text-gray-600">Loading reports...</div>
+            <div className="text-center py-8 text-muted-foreground">Loading reports...</div>
           )}
 
           {error && (
@@ -166,7 +166,7 @@ const ReportsDashboard = () => {
           )}
 
           {!loading && reports.length === 0 && (
-            <div className="text-center py-8 text-gray-600">
+            <div className="text-center py-8 text-muted-foreground">
               No {filterStatus} reports found
             </div>
           )}
@@ -174,7 +174,7 @@ const ReportsDashboard = () => {
           {reports.map((report) => (
             <div
               key={report._id}
-              className="bg-white border rounded-lg p-4 hover:shadow-md transition"
+              className="bg-card border rounded-lg p-4 hover:shadow-md transition"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -188,7 +188,7 @@ const ReportsDashboard = () => {
                       {getStatusIcon(report.status)}
                       {report.status}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {new Date(report.createdAt).toLocaleString()}
                     </span>
                   </div>
@@ -196,8 +196,8 @@ const ReportsDashboard = () => {
                   {/* Reported By */}
                   <div className="text-sm mb-2">
                     <span className="font-medium">Reported by:</span>{" "}
-                    <span className="text-gray-700">{report.reportedBy?.name}</span>
-                    <span className="text-gray-500 ml-2">
+                    <span className="text-foreground">{report.reportedBy?.name}</span>
+                    <span className="text-muted-foreground ml-2">
                       ({report.reportedBy?.email})
                     </span>
                   </div>
@@ -214,16 +214,16 @@ const ReportsDashboard = () => {
                   {report.description && (
                     <div className="text-sm mb-2">
                       <span className="font-medium">Description:</span>
-                      <p className="text-gray-700 mt-1 italic">
+                      <p className="text-foreground mt-1 italic">
                         "{report.description}"
                       </p>
                     </div>
                   )}
 
                   {/* Post Content */}
-                  <div className="bg-gray-50 p-3 rounded mb-2 text-sm">
-                    <span className="font-medium text-gray-900">Post Content:</span>
-                    <p className="text-gray-700 mt-1 break-words">
+                  <div className="bg-muted p-3 rounded mb-2 text-sm">
+                    <span className="font-medium text-foreground">Post Content:</span>
+                    <p className="text-foreground mt-1 break-words">
                       {report.post?.content?.substring(0, 200)}
                       {report.post?.content?.length > 200 ? "..." : ""}
                     </p>
@@ -242,14 +242,14 @@ const ReportsDashboard = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setSelectedReport(report)}
-                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1 whitespace-nowrap"
+                    className="px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition flex items-center gap-1 whitespace-nowrap"
                   >
                     <Eye size={16} />
                     View
                   </button>
                   <button
                     onClick={() => navigate(`/forums/${report.post?._id}`)}
-                    className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition flex items-center gap-1 whitespace-nowrap"
+                    className="px-3 py-2 bg-muted text-foreground rounded hover:bg-muted/80 transition flex items-center gap-1 whitespace-nowrap"
                   >
                     <MessageSquare size={16} />
                     Post
@@ -262,13 +262,13 @@ const ReportsDashboard = () => {
 
         {/* Report Details Modal */}
         {selectedReport && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-2xl font-bold">Report Details</h2>
                 <button
                   onClick={() => setSelectedReport(null)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                  className="text-muted-foreground hover:text-foreground text-2xl"
                 >
                   ×
                 </button>
@@ -284,7 +284,7 @@ const ReportsDashboard = () => {
 
                 <div>
                   <span className="font-medium">Reported By:</span>
-                  <p className="text-gray-700 mt-1">
+                  <p className="text-foreground mt-1">
                     {selectedReport.reportedBy?.name} ({selectedReport.reportedBy?.email})
                   </p>
                 </div>
@@ -297,13 +297,13 @@ const ReportsDashboard = () => {
                 {selectedReport.description && (
                   <div>
                     <span className="font-medium">Description:</span>
-                    <p className="text-gray-700 mt-1">{selectedReport.description}</p>
+                    <p className="text-foreground mt-1">{selectedReport.description}</p>
                   </div>
                 )}
 
                 <div>
                   <span className="font-medium">Post Content:</span>
-                  <p className="bg-gray-50 p-3 rounded mt-1 text-gray-700">
+                  <p className="bg-muted p-3 rounded mt-1 text-foreground">
                     {selectedReport.post?.content}
                   </p>
                 </div>

@@ -58,7 +58,7 @@ export default function Login() {
       </div>
 
       {/* Main Card - Center */}
-      <Card className="w-full max-w-md shadow-2xl border border-border relative z-10 backdrop-blur-sm bg-white/95">
+      <Card className="w-full max-w-md shadow-2xl border border-border relative z-10 backdrop-blur-sm bg-card">
         <CardContent className="p-10 space-y-8">
           {/* Header with Icon */}
           <div className="text-center">
@@ -70,7 +70,7 @@ export default function Login() {
           </div>
 
           {error && (
-            <p className="text-red-500 text-center text-sm bg-red-50 rounded-lg p-3 border border-red-200">{error}</p>
+            <p className="text-destructive text-center text-sm bg-destructive/10 rounded-lg p-3 border border-destructive/20">{error}</p>
           )}
 
           <div className="space-y-3">

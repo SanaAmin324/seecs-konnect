@@ -96,7 +96,7 @@ const PostOptionsMenu = ({ post, currentUserId, isAdmin, onPostDeleted, onPostEd
 
           {/* Close button if no actions available */}
           {!canEdit && !canDelete && !canReport && (
-            <div className="px-4 py-2 text-sm text-gray-500">No actions available</div>
+            <div className="px-4 py-2 text-sm text-muted-foreground">No actions available</div>
           )}
         </div>
       )}
