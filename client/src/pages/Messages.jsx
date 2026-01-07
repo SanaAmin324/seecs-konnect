@@ -69,12 +69,15 @@ export default function Messages() {
 
   useEffect(() => {
     if (selectedConversation) {
-      fetchMessages(selectedConversation.otherUser._id);
+      fetchMessages(selectedConversation.otherUser._id, true); // Scroll to bottom on initial load
       // Mark as read
       markConversationAsRead(selectedConversation.otherUser._id);
+      // Reset scroll flags
+      setUserScrolled(false);
+      setShouldScrollToBottom(false);
       // Poll for new messages every 3 seconds
       const interval = setInterval(() => {
-        fetchMessages(selectedConversation.otherUser._id);
+        fetchMessages(selectedConversation.otherUser._id, false); // Don't auto-scroll on polling
       }, 3000);
       return () => clearInterval(interval);
     }
@@ -114,7 +117,7 @@ export default function Messages() {
     }
   };
 
-  const fetchMessages = async (userId) => {
+  const fetchMessages = async (userId, scrollToEnd = false) => {
     try {
       const token = JSON.parse(localStorage.getItem("user"))?.token;
       const response = await fetch(`http://localhost:5000/api/messages/${userId}`, {
@@ -122,6 +125,13 @@ export default function Messages() {
       });
       const data = await response.json();
       setMessages(data);
+      
+      // Only scroll to bottom if explicitly requested (initial load)
+      if (scrollToEnd) {
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+        }, 100);
+      }
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -163,6 +173,7 @@ export default function Messages() {
       if (response.ok) {
         setNewMessage("");
         setShouldScrollToBottom(true); // Scroll to bottom when user sends message
+        setUserScrolled(false); // Reset scroll flag to allow scroll
         fetchMessages(selectedConversation.otherUser._id);
         fetchConversations(); // Update conversation list
         // Keep focus on input after sending
