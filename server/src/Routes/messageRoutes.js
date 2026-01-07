@@ -6,7 +6,11 @@ const {
   getMessages,
   sendMessage,
   markAsRead,
-  getUnreadCount
+  getUnreadCount,
+  reactToMessage,
+  removeReaction,
+  unsendMessage,
+  deleteMessageForMe
 } = require('../controllers/messageController');
 
 // Get unread count
@@ -23,5 +27,17 @@ router.post('/:userId', protect, sendMessage);
 
 // Mark conversation as read
 router.patch('/:userId/read', protect, markAsRead);
+
+// React to a message
+router.post('/:messageId/react', protect, reactToMessage);
+
+// Remove reaction from a message
+router.delete('/:messageId/react', protect, removeReaction);
+
+// Delete message for me only
+router.delete('/:messageId/for-me', protect, deleteMessageForMe);
+
+// Unsend message (removes for everyone)
+router.delete('/:messageId', protect, unsendMessage);
 
 module.exports = router;

@@ -24,7 +24,26 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true,
     index: true
-  }
+  },
+  reactions: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    emoji: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  deleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedFor: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, { timestamps: true });
 
 // Index for efficient querying

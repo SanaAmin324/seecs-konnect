@@ -13,7 +13,9 @@ const notificationSchema = new mongoose.Schema({
       'connection_accepted',
       'post_like',
       'post_comment',
-      'post_repost'
+      'post_repost',
+      'message_reaction',
+      'message_like'
     ], 
     required: true 
   },
