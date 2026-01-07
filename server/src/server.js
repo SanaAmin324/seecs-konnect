@@ -39,6 +39,7 @@ app.use('/api/forums', require('./Routes/forumRoutes'));
 app.use('/api/reports', require('./Routes/reportRoutes'));
 app.use("/api/notifications", require("./Routes/notificationRoutes"));
 app.use("/api/profile", require("./Routes/profileRoutes"));
+app.use("/api/messages", require("./Routes/messageRoutes"));
 
 
 

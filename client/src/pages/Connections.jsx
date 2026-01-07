@@ -111,7 +111,7 @@ const Connections = () => {
   };
 
   const handleMessage = (connectionId) => {
-    alert("Messaging feature coming soon!");
+    navigate(`/messages?userId=${connectionId}`);
   };
 
   if (loading) {

@@ -5,6 +5,7 @@ import {
   LogOut,
   FolderOpen,
   Flag,
+  MessageCircle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,6 +30,7 @@ const menuItems = [
   { title: "Dashboard", icon: Home, url: "/dashboard" },
   { title: "Resources", icon: FolderOpen, url: "/documents" },
   { title: "Forums", icon: MessageSquare, url: "/forums" },
+  { title: "Messages", icon: MessageCircle, url: "/messages" },
 ];
 
 export function AppSidebar() {

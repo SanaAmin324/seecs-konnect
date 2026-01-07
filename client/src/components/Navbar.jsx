@@ -1,4 +1,4 @@
-import { Sun, Moon, Bell, LogOut, Menu } from "lucide-react";
+import { Sun, Moon, Bell, LogOut, Menu, MessageCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,6 +22,7 @@ export default function Navbar() {
   const [username, setUsername] = useState(null); // ✅ FIX ADDED
   const [profilePicture, setProfilePicture] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -32,6 +33,7 @@ export default function Navbar() {
   const isForums = pathname.startsWith("/forums");
   const isForumPage = pathname.startsWith("/forums");
   const isNotificationsPage = pathname === "/notifications";
+  const isMessagesPage = pathname === "/messages";
 
   // Immediately set count to 0 when on notifications page
   useEffect(() => {
@@ -95,12 +97,30 @@ export default function Navbar() {
             });
         };
 
+        // Function to fetch unread message count
+        const fetchUnreadMessageCount = () => {
+          fetch(`http://localhost:5000/api/messages/unread/count`, {
+            headers: {
+              Authorization: `Bearer ${parsed.token}`,
+            },
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              setUnreadMessageCount(data.unreadCount || 0);
+            })
+            .catch((err) => {
+              console.error("Error fetching unread message count:", err);
+            });
+        };
+
         // Fetch immediately
         fetchUnreadCount();
+        fetchUnreadMessageCount();
 
         // Poll every 3 seconds when on notifications page, every 15 seconds otherwise
         const pollInterval = isNotificationsPage ? 3000 : 15000;
         const intervalId = setInterval(fetchUnreadCount, pollInterval);
+        const messageIntervalId = setInterval(fetchUnreadMessageCount, 5000); // Poll messages every 5 seconds
 
         // Listen for notifications page view event to refresh immediately
         const handleNotificationsViewed = () => {
@@ -116,9 +136,15 @@ export default function Navbar() {
           setUnreadCount(0);
         }
 
+        // If we're on the messages page, set message count to 0 immediately
+        if (isMessagesPage) {
+          setUnreadMessageCount(0);
+        }
+
         // Cleanup interval on unmount
         return () => {
           clearInterval(intervalId);
+          clearInterval(messageIntervalId);
           window.removeEventListener('notificationsViewed', handleNotificationsViewed);
         };
       }
@@ -224,6 +250,20 @@ export default function Navbar() {
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                 {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </Button>
+        </Link>
+
+        <Link to="/messages">
+          <Button
+            variant="ghost"
+            className="rounded-full p-2 hover:bg-primary/20 relative"
+          >
+            <MessageCircle className="w-5 h-5 text-foreground" />
+            {unreadMessageCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                {unreadMessageCount > 9 ? "9+" : unreadMessageCount}
               </span>
             )}
           </Button>

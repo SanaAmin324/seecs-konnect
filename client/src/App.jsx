@@ -27,6 +27,7 @@ import UserProfile from "@/pages/UserProfile";
 import Settings from "@/pages/Settings";
 import Connections from "@/pages/Connections";
 import Notifications from "@/pages/Notifications";
+import Messages from "@/pages/Messages";
 
 /* Admin */
 import ReportsDashboard from "./pages/Admin/ReportsDashboard";
@@ -102,6 +103,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Notifications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
             </ProtectedRoute>
           }
         />

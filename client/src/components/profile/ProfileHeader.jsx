@@ -174,8 +174,8 @@ const ProfileHeader = ({ user, isOwnProfile }) => {
   };
 
   const handleMessage = () => {
-    // TODO: Implement messaging functionality
-    alert("Messaging feature coming soon!");
+    // Navigate to messages page with this user's ID
+    navigate(`/messages?userId=${user._id}`);
   };
 
   return (
