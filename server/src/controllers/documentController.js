@@ -55,7 +55,7 @@ const getDocuments = asyncHandler(async (req, res) => {
   const totalDocs = await Document.countDocuments(filter);
 
   const documents = await Document.find(filter)
-    .populate("uploader", "name email program batch")
+    .populate("uploader", "name email username profilePicture program batch")
     .sort({ createdAt: -1 })
     .skip(parseInt(skip))
     .limit(parseInt(limit));
@@ -136,7 +136,7 @@ const searchDocuments = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
 
   let documents = await Document.find(query)
-    .populate("uploader", "name email program batch")
+    .populate("uploader", "name email username profilePicture program batch")
     .sort({ createdAt: -1 })
     .skip(parseInt(skip))
     .limit(parseInt(limit));

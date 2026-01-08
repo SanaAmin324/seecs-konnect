@@ -19,13 +19,17 @@ const storage = multer.diskStorage({
 const allowedTypes = [
   // 🖼 Images
   "image/jpeg",
+  "image/jpg",
   "image/png",
   "image/gif",
+  "image/webp",
+  "image/svg+xml",
 
   // 🎥 Videos
   "video/mp4",
   "video/webm",
   "video/quicktime",
+  "video/x-msvideo",
 
   // 📄 Documents
   "application/pdf",

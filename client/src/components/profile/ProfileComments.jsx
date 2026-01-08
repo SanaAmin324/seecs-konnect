@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
+import { formatTimeAgo } from "@/lib/timeUtils";
 
 const ProfileComments = ({ user }) => {
   const [comments, setComments] = useState([]);
@@ -64,11 +65,11 @@ const ProfileComments = ({ user }) => {
                   <>
                     On post by <span className="font-medium">{comment.post.user?.name}</span>
                     {" • "}
-                    {new Date(comment.createdAt).toLocaleDateString()}
+                    {formatTimeAgo(comment.createdAt)}
                   </>
                 ) : (
                   <>
-                    {new Date(comment.createdAt).toLocaleDateString()}
+                    {formatTimeAgo(comment.createdAt)}
                   </>
                 )}
               </div>

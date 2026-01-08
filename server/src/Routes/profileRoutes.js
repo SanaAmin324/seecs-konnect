@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getUserById,
+  getUserByUsername,
   updateUserProfile,
   uploadProfilePicture,
   removeProfilePicture,
@@ -12,9 +13,16 @@ const {
   removeConnection,
   getUserConnections,
   getConnectionStatus,
+  checkUsernameAvailability,
+  searchUsers,
 } = require("../controllers/profileController");
 const { protect } = require("../middleware/authMiddleware");
 const profileUpload = require("../middleware/profileUpload");
+
+// Username and search routes - specific routes FIRST
+router.get("/check-username/:username", checkUsernameAvailability);
+router.get("/search", protect, searchUsers);
+router.get("/username/:username", protect, getUserByUsername);
 
 // Profile routes - specific routes BEFORE parameterized routes
 router.put("/update", protect, updateUserProfile);

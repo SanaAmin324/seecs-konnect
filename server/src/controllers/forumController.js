@@ -69,7 +69,7 @@ const createPost = asyncHandler(async (req, res) => {
 // -----------------------------------------------------
 const getPost = asyncHandler(async (req, res) => {
   const post = await ForumPost.findById(req.params.id)
-    .populate("user", "name email")
+    .populate("user", "name email username profilePicture")
     .populate({
       path: "likes",
       select: "name",
@@ -89,7 +89,7 @@ const getPost = asyncHandler(async (req, res) => {
 // -----------------------------------------------------
 const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await ForumPost.find()
-    .populate("user", "name email")
+    .populate("user", "name email username profilePicture")
     .sort({ createdAt: -1 });
 
   res.json(posts);
@@ -306,7 +306,7 @@ const getComments = asyncHandler(async (req, res) => {
   }
 
   const comments = await Comment.find({ post: postId })
-    .populate("user", "name email")
+    .populate("user", "name email username profilePicture")
     .sort({ createdAt: -1 });
 
   res.json(comments);
@@ -371,7 +371,7 @@ const editPost = asyncHandler(async (req, res) => {
   await post.save();
 
   // Populate and return updated post
-  await post.populate("user", "name email");
+  await post.populate("user", "name email username profilePicture");
 
   res.json({
     message: "Post updated successfully",
@@ -429,7 +429,7 @@ const getUserPosts = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   
   const posts = await ForumPost.find({ user: userId })
-    .populate("user", "name email cms program")
+    .populate("user", "name email cms program username profilePicture")
     .populate("likes", "name")
     .populate("reposts", "name")
     .sort({ createdAt: -1 });
@@ -444,7 +444,7 @@ const getUserReposts = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   
   const posts = await ForumPost.find({ reposts: userId })
-    .populate("user", "name email cms program")
+    .populate("user", "name email cms program username profilePicture")
     .populate("likes", "name")
     .populate("reposts", "name")
     .sort({ createdAt: -1 });
@@ -459,7 +459,7 @@ const getUserLikedPosts = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   
   const posts = await ForumPost.find({ likes: userId })
-    .populate("user", "name email cms program")
+    .populate("user", "name email cms program username profilePicture")
     .populate("likes", "name")
     .populate("reposts", "name")
     .sort({ createdAt: -1 });
@@ -474,13 +474,13 @@ const getUserComments = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   
   const comments = await Comment.find({ user: userId })
-    .populate("user", "name email cms program")
+    .populate("user", "name email cms program username profilePicture")
     .populate({
       path: "post",
       select: "content user createdAt",
       populate: {
         path: "user",
-        select: "name"
+        select: "name username"
       }
     })
     .sort({ createdAt: -1 });

@@ -20,6 +20,22 @@ const getUserById = asyncHandler(async (req, res) => {
   res.json(user);
 });
 
+// @desc    Get user by username (public profile view)
+// @route   GET /api/profile/username/:username
+// @access  Private
+const getUserByUsername = asyncHandler(async (req, res) => {
+  const user = await User.findOne({ username: req.params.username.toLowerCase() })
+    .select("-password")
+    .populate("connections", "name email profilePicture headline");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.json(user);
+});
+
 // @desc    Update user profile
 // @route   PUT /api/profile/update
 // @access  Private
@@ -29,6 +45,32 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (!user) {
     res.status(404);
     throw new Error("User not found");
+  }
+
+  // Handle username update with validation
+  if (req.body.username !== undefined && req.body.username !== user.username) {
+    const newUsername = req.body.username.toLowerCase().trim();
+    
+    // Validate username format
+    const usernameRegex = /^[a-z0-9_.]+$/;
+    if (!usernameRegex.test(newUsername)) {
+      res.status(400);
+      throw new Error("Username can only contain lowercase letters, numbers, underscores, and dots");
+    }
+    
+    if (newUsername.length < 3 || newUsername.length > 30) {
+      res.status(400);
+      throw new Error("Username must be between 3 and 30 characters");
+    }
+    
+    // Check if username is already taken
+    const existingUser = await User.findOne({ username: newUsername });
+    if (existingUser) {
+      res.status(400);
+      throw new Error("Username is already taken");
+    }
+    
+    user.username = newUsername;
   }
 
   // Update allowed fields only
@@ -51,6 +93,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     _id: updatedUser._id,
     name: updatedUser.name,
     email: updatedUser.email,
+    username: updatedUser.username,
     profilePicture: updatedUser.profilePicture,
     bio: updatedUser.bio,
     headline: updatedUser.headline,
@@ -427,8 +470,60 @@ const getConnectionStatus = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Check if username is available
+// @route   GET /api/profile/check-username/:username
+// @access  Public
+const checkUsernameAvailability = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  
+  // Validate username format
+  const usernameRegex = /^[a-z0-9_.]+$/;
+  if (!usernameRegex.test(username)) {
+    res.status(400);
+    throw new Error("Username can only contain lowercase letters, numbers, underscores, and dots");
+  }
+  
+  if (username.length < 3 || username.length > 30) {
+    res.status(400);
+    throw new Error("Username must be between 3 and 30 characters");
+  }
+  
+  const existingUser = await User.findOne({ username: username.toLowerCase() });
+  
+  res.json({
+    available: !existingUser,
+    username: username.toLowerCase()
+  });
+});
+
+// @desc    Search users by username or name
+// @route   GET /api/profile/search?q=searchterm
+// @access  Private
+const searchUsers = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q || q.trim().length === 0) {
+    return res.json([]);
+  }
+  
+  const searchTerm = q.trim();
+  
+  // Search by username or name (case-insensitive)
+  const users = await User.find({
+    $or: [
+      { username: { $regex: searchTerm, $options: 'i' } },
+      { name: { $regex: searchTerm, $options: 'i' } }
+    ]
+  })
+  .select('_id name username email profilePicture headline bio')
+  .limit(20);
+  
+  res.json(users);
+});
+
 module.exports = {
   getUserById,
+  getUserByUsername,
   updateUserProfile,
   uploadProfilePicture,
   removeProfilePicture,
@@ -439,4 +534,6 @@ module.exports = {
   removeConnection,
   getUserConnections,
   getConnectionStatus,
+  checkUsernameAvailability,
+  searchUsers,
 };

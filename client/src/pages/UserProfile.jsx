@@ -15,28 +15,43 @@ import ProfileLikedPosts from "@/components/profile/ProfileLikedPosts";
 
 const UserProfile = () => {
   const { user } = useAuth();
-  const { userId } = useParams(); // Get userId from URL params
+  const { userId, username } = useParams(); // Get userId or username from URL params
   const [activeTab, setActiveTab] = useState("overview");
   const [profileUser, setProfileUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Determine if viewing own profile or another user's profile
-  const isOwnProfile = !userId || userId === user?._id;
+  console.log("UserProfile - userId from URL:", userId);
+  console.log("UserProfile - username from URL:", username);
+  console.log("UserProfile - current user ID:", user?._id);
 
   useEffect(() => {
     const fetchProfileUser = async () => {
       try {
+        setLoading(true); // Set loading when fetching new profile
         const authUser = JSON.parse(localStorage.getItem("user"));
         
-        // Always fetch from API to get latest data, even for own profile
-        const targetUserId = userId || user?._id;
+        // Determine the target: userId, username, or own profile
+        let apiUrl;
+        if (userId) {
+          // Route: /profile/:userId
+          apiUrl = `http://localhost:5000/api/profile/${userId}`;
+          console.log("Fetching profile by userId:", userId);
+        } else if (username) {
+          // Route: /u/:username - need to fetch by username
+          apiUrl = `http://localhost:5000/api/profile/username/${username}`;
+          console.log("Fetching profile by username:", username);
+        } else {
+          // No params - own profile
+          apiUrl = `http://localhost:5000/api/profile/${user?._id}`;
+          console.log("Fetching own profile for userId:", user?._id);
+        }
         
-        if (!targetUserId) {
+        if (!apiUrl || (!userId && !username && !user?._id)) {
           setLoading(false);
           return;
         }
         
-        const response = await fetch(`http://localhost:5000/api/profile/${targetUserId}`, {
+        const response = await fetch(apiUrl, {
           headers: {
             Authorization: `Bearer ${authUser.token}`,
           },
@@ -44,19 +59,28 @@ const UserProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched profile data:", data);
+          console.log("Is this my profile?", data._id === user?._id);
           setProfileUser(data);
         } else {
           console.error("Failed to fetch user profile");
+          setProfileUser(null);
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
+        setProfileUser(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfileUser();
-  }, [userId, user, isOwnProfile]);
+  }, [userId, username, user?._id]); // Trigger on userId, username, or current user change
+
+  // Determine if viewing own profile - MUST be calculated after profileUser is fetched
+  const isOwnProfile = profileUser?._id === user?._id;
+
+  console.log("UserProfile - isOwnProfile:", isOwnProfile);
 
   if (loading) {
     return (

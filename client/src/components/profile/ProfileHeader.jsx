@@ -201,6 +201,9 @@ const ProfileHeader = ({ user, isOwnProfile }) => {
               <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-semibold rounded-full">Admin</span>
             )}
           </div>
+          {user?.username && (
+            <p className="text-sm text-muted-foreground font-medium">@{user.username}</p>
+          )}
           {user?.headline && (
             <p className="text-sm text-foreground font-medium mt-1">{user.headline}</p>
           )}

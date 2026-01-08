@@ -92,7 +92,7 @@ const CreatePostForm = () => {
           }
           
           // Validate file type
-          const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'];
+          const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
           if (!validTypes.some(type => file.type.includes(type))) {
             throw new Error(`File "${file.name}" has an unsupported format. Please use image or video files.`);
           }
@@ -109,7 +109,7 @@ const CreatePostForm = () => {
         );
       }
 
-      const res = await fetch("http://localhost:5000/api/forum", {
+      const res = await fetch("http://localhost:5000/api/forums", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

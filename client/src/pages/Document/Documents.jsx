@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -13,8 +14,11 @@ import {
 import { Upload, FileText, Search, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
+import { formatTimeAgo } from "@/lib/timeUtils";
+import { useNavigate } from "react-router-dom";
 
 const Documents = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
@@ -55,7 +59,12 @@ const Documents = () => {
         type: d.category || "Unknown",
         instructor: d.uploader?.name || "",
         pages: d.files?.length || 0,
-        uploadedBy: d.uploader?.name || "",
+        uploader: {
+          _id: d.uploader?._id,
+          name: d.uploader?.name || "Unknown",
+          username: d.uploader?.username || "",
+          profilePicture: d.uploader?.profilePicture || null,
+        },
         createdAt: d.createdAt,
         files: d.files || [],
       }));
@@ -214,10 +223,40 @@ const Documents = () => {
                             <Badge className="rounded-full bg-primary/20 text-primary-foreground border border-primary/30 text-xs">{doc.course}</Badge>
                             <Badge className="rounded-full bg-accent/20 text-accent-foreground border border-accent/30 text-xs">{doc.type}</Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-1">{doc.instructor}</p>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>Uploaded by {doc.uploadedBy}</span>
-                            <span>{doc.createdAt ? new Date(doc.createdAt).toLocaleString() : doc.timeAgo}</span>
+                          <p className="text-sm text-muted-foreground mb-2">{doc.instructor}</p>
+                          
+                          {/* Uploader info with avatar */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div 
+                              className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (doc.uploader?.username) {
+                                  navigate(`/u/${doc.uploader.username}`);
+                                }
+                              }}
+                            >
+                              <Avatar className="w-6 h-6 border border-border">
+                                {doc.uploader?.profilePicture ? (
+                                  <AvatarImage 
+                                    src={`http://localhost:5000${doc.uploader.profilePicture}`} 
+                                    alt={doc.uploader.name}
+                                  />
+                                ) : null}
+                                <AvatarFallback className="text-xs">
+                                  {doc.uploader?.name?.charAt(0).toUpperCase() || "U"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-xs font-medium text-foreground">{doc.uploader?.name || "Unknown"}</span>
+                                {doc.uploader?.username && (
+                                  <span className="text-xs text-muted-foreground">@{doc.uploader.username}</span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {doc.createdAt ? formatTimeAgo(doc.createdAt) : "Unknown"}
+                            </span>
                           </div>
                         </div>
                       </div>

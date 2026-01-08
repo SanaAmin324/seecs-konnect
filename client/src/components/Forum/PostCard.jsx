@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ShareModal from "./ShareModal";
+import { formatTimeAgo } from "@/lib/timeUtils";
 
 const PostCard = ({ post, viewType }) => {
   const navigate = useNavigate();
@@ -71,13 +72,6 @@ const PostCard = ({ post, viewType }) => {
 
   const goToPost = () => {
     navigate(`/forums/${post._id}`);
-  };
-
-  const timeAgo = (date) => {
-    const diff = Math.floor(
-      (Date.now() - new Date(date)) / (1000 * 60 * 60)
-    );
-    return `${diff}h ago`;
   };
 
   const toggleLike = async () => {
@@ -172,21 +166,56 @@ const PostCard = ({ post, viewType }) => {
         <div className="flex-1 p-4">
 
           {/* HEADER */}
-          <div className="text-xs text-muted-foreground mb-1">
-            <span className="font-semibold text-card-foreground">
-              Forum
-            </span>{" "}
-            • Posted by{" "}
-            <span 
+          <div className="flex items-start gap-3 mb-3">
+            {/* User Avatar */}
+            <div 
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/profile/${post.user?._id}`);
               }}
-              className="font-semibold text-primary hover:underline cursor-pointer"
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-80 transition flex-shrink-0 overflow-hidden"
             >
-              {post.user?.name}
-            </span>{" "}
-            • {timeAgo(post.createdAt)}
+              {post.user?.profilePicture ? (
+                <img 
+                  src={`http://localhost:5000${post.user.profilePicture}`} 
+                  alt={post.user.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                post.user?.name?.charAt(0).toUpperCase()
+              )}
+            </div>
+            
+            {/* User Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/profile/${post.user?._id}`);
+                  }}
+                  className="font-semibold text-card-foreground hover:underline cursor-pointer"
+                >
+                  {post.user?.name}
+                </span>
+                {post.user?.username && (
+                  <span 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/profile/${post.user?._id}`);
+                    }}
+                    className="text-sm text-muted-foreground hover:text-primary cursor-pointer transition"
+                  >
+                    @{post.user.username}
+                  </span>
+                )}
+                <span className="text-xs text-muted-foreground">•</span>
+                <span className="text-xs text-muted-foreground">{formatTimeAgo(post.createdAt)}</span>
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                <span className="font-semibold text-card-foreground">Forum</span>
+              </div>
+            </div>
           </div>
 
           {/* TITLE - assuming no title, use content as title or something */}

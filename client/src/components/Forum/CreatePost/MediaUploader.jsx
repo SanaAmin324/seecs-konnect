@@ -4,7 +4,7 @@ const MediaUploader = ({ files, setFiles }) => {
 
   const addFiles = (newFiles) => {
     const validFiles = [];
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'];
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
     const maxSize = 50 * 1024 * 1024; // 50MB
 
     for (let file of newFiles) {
@@ -59,13 +59,13 @@ const MediaUploader = ({ files, setFiles }) => {
         <input
           type="file"
           multiple
-          accept="image/jpeg,image/png,image/gif,video/mp4,video/webm"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,video/mp4,video/webm"
           className="hidden"
           onChange={(e) => addFiles(e.target.files)}
         />
         <div className="text-sm">
           <p className="font-medium">Drag & drop or choose files</p>
-          <p className="text-xs text-gray-500 mt-1">Supported: JPG, PNG, GIF, MP4, WebM (Max 50MB)</p>
+          <p className="text-xs text-gray-500 mt-1">Supported: JPG, PNG, GIF, WebP, MP4, WebM (Max 50MB)</p>
         </div>
       </label>
 

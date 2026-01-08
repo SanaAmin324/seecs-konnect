@@ -6,6 +6,17 @@ const userSchema = mongoose.Schema(
     name: { type: String, required: true },
     cms: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    username: { 
+      type: String, 
+      required: true, 
+      unique: true,
+      lowercase: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+      match: [/^[a-z0-9_.]+$/, 'Username can only contain lowercase letters, numbers, underscores, and dots'],
+      index: true
+    },
     password: { type: String, required: true },
     program: String,
     batch: String,

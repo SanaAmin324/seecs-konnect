@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CommentItem = ({
   comment,
@@ -6,6 +7,7 @@ const CommentItem = ({
   onSubmit,
   onReplySubmit,
 }) => {
+  const navigate = useNavigate();
   const [replying, setReplying] = useState(false);
   const [text, setText] = useState("");
 
@@ -41,14 +43,41 @@ const CommentItem = ({
     <div className="space-y-2">
       {/* Comment */}
       <div className="flex gap-3">
-        <div className="w-9 h-9 bg-muted rounded-full" />
+        {/* Profile Picture */}
+        <div 
+          onClick={() => comment.userId && navigate(`/profile/${comment.userId}`)}
+          className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-80 transition flex-shrink-0 overflow-hidden"
+        >
+          {comment.profilePicture ? (
+            <img 
+              src={`http://localhost:5000${comment.profilePicture}`} 
+              alt={comment.author}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            comment.author?.charAt(0).toUpperCase()
+          )}
+        </div>
 
         <div className="flex-1">
           <div className="bg-muted rounded-lg p-3">
-            <div className="text-sm font-medium text-foreground">
-              {comment.author}
-              <span className="text-xs text-muted-foreground ml-2">
-                {comment.time}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span 
+                onClick={() => comment.userId && navigate(`/profile/${comment.userId}`)}
+                className="text-sm font-medium text-foreground cursor-pointer hover:underline"
+              >
+                {comment.author}
+              </span>
+              {comment.username && (
+                <span 
+                  onClick={() => comment.userId && navigate(`/profile/${comment.userId}`)}
+                  className="text-xs text-muted-foreground cursor-pointer hover:text-primary transition"
+                >
+                  @{comment.username}
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground">
+                • {comment.time}
               </span>
             </div>
             <p className="text-sm mt-1 text-foreground">{comment.text}</p>

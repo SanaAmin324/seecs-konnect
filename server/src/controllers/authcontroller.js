@@ -16,6 +16,7 @@ const loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      username: user.username,
       role: user.role,
       token: generateToken(user._id),
     };
@@ -46,6 +47,7 @@ const getUserProfile = async (req, res) => {
     _id: req.user._id,
     name: req.user.name,
     email: req.user.email,
+    username: req.user.username,
     role: req.user.role,
   };
 

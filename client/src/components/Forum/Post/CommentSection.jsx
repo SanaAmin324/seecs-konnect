@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CommentItem from "./CommentItem";
+import { formatTimeAgo } from "@/lib/timeUtils";
 
 const CommentSection = ({ postId }) => {
   const [comments, setComments] = useState([]);
@@ -88,8 +89,11 @@ const CommentSection = ({ postId }) => {
               comment={{
                 id: c._id,
                 author: c.user?.name || "Unknown",
+                username: c.user?.username,
+                userId: c.user?._id,
+                profilePicture: c.user?.profilePicture,
                 text: c.text,
-                time: new Date(c.createdAt).toLocaleString(),
+                time: formatTimeAgo(c.createdAt),
                 replies: [], // Assuming no nested replies for now
               }}
               onReplySubmit={handleReply}

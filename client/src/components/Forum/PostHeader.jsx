@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { formatTimeAgo } from "@/lib/timeUtils";
 
 const PostHeader = ({ author, createdAt, userId }) => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const PostHeader = ({ author, createdAt, userId }) => {
         {author}
       </span>
       <span>•</span>
-      <span>{createdAt}</span>
+      <span>{formatTimeAgo(createdAt)}</span>
     </div>
   );
 };
