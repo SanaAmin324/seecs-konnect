@@ -14,7 +14,6 @@ import Documents from "./pages/Document/Documents";
 import { DocumentUploadProvider } from "@/context/DocumentUploadContext";
 import UploadDocument from "@/pages/Document/UploadDocument";
 import DocumentInfo from "@/pages/Document/DocumentInfo";
-import DocumentCategory from "@/pages/Document/DocumentCategory";
 import DocumentReview from "@/pages/Document/DocumentReview";
 
 /* Forum */
@@ -25,9 +24,6 @@ import CreatePost from "./pages/Forum/CreatePost";
 /* User */
 import UserProfile from "@/pages/UserProfile";
 import Settings from "@/pages/Settings";
-import Connections from "@/pages/Connections";
-import Notifications from "@/pages/Notifications";
-import Messages from "@/pages/Messages";
 
 /* Admin */
 import ReportsDashboard from "./pages/Admin/ReportsDashboard";
@@ -80,42 +76,6 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/connections"
-          element={
-            <ProtectedRoute>
-              <Connections />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/connections/:userId"
-          element={
-            <ProtectedRoute>
-              <Connections />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/messages"
-          element={
-            <ProtectedRoute>
-              <Messages />
-            </ProtectedRoute>
-          }
-        />
-
         {/* ===================== */}
         {/* Dashboard */}
         {/* ===================== */}
@@ -158,15 +118,7 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/documents/category"
-          element={
-            <DocumentUploadProvider>
-              <DocumentCategory />
-            </DocumentUploadProvider>
-          }
-        />
-
+        
         <Route
           path="/documents/review"
           element={

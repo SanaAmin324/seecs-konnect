@@ -6,7 +6,6 @@ export default function DocumentProgressBar({ currentStep }) {
   const steps = [
     { label: "Upload", path: "/documents/upload" },
     { label: "Info", path: "/documents/info" },
-    { label: "Category", path: "/documents/category" },
     { label: "Review", path: "/documents/review" },
   ];
 

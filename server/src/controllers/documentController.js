@@ -7,13 +7,39 @@ const path = require("path");
 // Upload document (multiple files)
 const uploadDocument = asyncHandler(async (req, res) => {
   try {
-    if (!req.files || req.files.length === 0)
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "At least one file is required" });
+    }
+    if (req.files.length > 3) {
+      return res.status(400).json({ message: "You can upload a maximum of 3 files per document." });
+    }
 
-    const { title, description, course, class: className, academicYear, category } = req.body;
+
+    let { title, description, course, academicYear, category } = req.body;
+
+    // Fallback: if title or course missing, try to get from documents[0]
+    if ((!title || !course) && req.body.documents) {
+      let docsArr = [];
+      try {
+        docsArr = JSON.parse(req.body.documents);
+      } catch {}
+      if (docsArr && docsArr[0]) {
+        title = title || docsArr[0].title;
+        course = course || docsArr[0].course;
+        description = description || docsArr[0].description;
+        academicYear = academicYear || docsArr[0].academicYear;
+        category = category || docsArr[0].category;
+      }
+    }
 
     if (!title || !course) {
       return res.status(400).json({ message: "Title and course are required" });
+    }
+
+    // Strict category validation
+    const allowedCategories = ["Notes", "Labs", "Past Papers", "Slides"];
+    if (!category || !allowedCategories.includes(category)) {
+      return res.status(400).json({ message: `Category is required and must be one of: ${allowedCategories.join(", ")}` });
     }
 
     // Prepare files array for schema
@@ -27,9 +53,8 @@ const uploadDocument = asyncHandler(async (req, res) => {
       title,
       description: description || "",
       course,
-      class: className || "",
       academicYear: academicYear || "",
-      category: category || "",
+      category,
       uploader: req.user._id,
       files: filesArray,
     });
@@ -122,7 +147,7 @@ const deleteDocument = asyncHandler(async (req, res) => {
 
 // Search documents
 const searchDocuments = asyncHandler(async (req, res) => {
-  const { title, course, category, className, academicYear, uploaderName, page = 1, limit = 10 } =
+  const { title, course, category, academicYear, uploaderName, page = 1, limit = 10 } =
     req.query;
 
   const query = {};
@@ -130,7 +155,6 @@ const searchDocuments = asyncHandler(async (req, res) => {
   if (title) query.title = { $regex: title, $options: "i" };
   if (course) query.course = { $regex: course, $options: "i" };
   if (category) query.category = { $regex: category, $options: "i" };
-  if (className) query.class = { $regex: className, $options: "i" };
   if (academicYear) query.academicYear = { $regex: academicYear, $options: "i" };
 
   const skip = (page - 1) * limit;

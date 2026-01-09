@@ -14,9 +14,12 @@ const documentSchema = new mongoose.Schema(
     description: { type: String },
 
     course: { type: String },
-    class: { type: String },
     academicYear: { type: String },
-    category: { type: String },
+    category: {
+      type: String,
+      enum: ["Notes", "Labs", "Past Papers", "Slides"],
+      required: true,
+    },
 
     uploader: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
