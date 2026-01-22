@@ -218,14 +218,13 @@ const PostCard = ({ post, viewType }) => {
             </div>
           </div>
 
-          {/* TITLE - assuming no title, use content as title or something */}
-          <h3 className="font-semibold text-lg hover:underline text-card-foreground">
-            {post.content.substring(0, 100)}...
-          </h3>
-
-          {/* MEDIA / TEXT */}
+          {/* TEXT / MEDIA */}
           {(viewType === "card" || expanded) && (
             <>
+              <p className="mt-3 text-sm text-card-foreground">
+                {getCleanContent(post.content)}
+              </p>
+
               {post.media && post.media.length > 0 && (
                 <div className="mt-3 rounded-lg overflow-hidden">
                   {(() => {
@@ -236,7 +235,7 @@ const PostCard = ({ post, viewType }) => {
                     return mediaType === "video" ? (
                       <video
                         src={`http://localhost:5000/uploads/forum/${mediaItem.filename}`}
-                        className="w-full max-h-[350px] object-cover bg-black rounded-lg"
+                        className="w-full max-h-[400px] object-contain bg-black rounded-lg"
                         controls
                         controlsList="nodownload"
                         preload="metadata"
@@ -251,7 +250,7 @@ const PostCard = ({ post, viewType }) => {
                       <img
                         src={`http://localhost:5000/uploads/forum/${mediaItem.filename}`}
                         alt="post media"
-                        className="w-full max-h-[350px] object-cover rounded-lg"
+                        className="w-full max-h-[400px] object-contain rounded-lg bg-muted"
                         onClick={(e) => e.stopPropagation()}
                         onError={(e) => {
                           console.error("Image loading error:", e);
@@ -261,10 +260,6 @@ const PostCard = ({ post, viewType }) => {
                   })()}
                 </div>
               )}
-
-              <p className="mt-3 text-sm text-card-foreground">
-                {getCleanContent(post.content)}
-              </p>
 
               {(() => {
                 const linksToShow = post.links && post.links.length > 0 

@@ -21,6 +21,7 @@ const {
   getUserComments,
   toggleSavePost,
   getUserSavedPosts,
+  searchPosts,
 } = require("../controllers/forumController");
 
 // Create a post (with media)
@@ -28,6 +29,9 @@ router.post("/", protect, forumUpload.array("media", 5), createPost);
 
 // Get all posts
 router.get("/", protect, getAllPosts);
+
+// Search posts
+router.get("/search", protect, searchPosts);
 
 // Get user's own posts
 router.get("/user/posts", protect, getUserPosts);

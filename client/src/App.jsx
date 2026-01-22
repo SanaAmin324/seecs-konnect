@@ -28,6 +28,7 @@ import Settings from "@/pages/Settings";
 import Connections from "@/pages/Connections";
 import Notifications from "@/pages/Notifications";
 import Messages from "@/pages/Messages";
+import Search from "@/pages/Search";
 
 /* Admin */
 import ReportsDashboard from "./pages/Admin/ReportsDashboard";
@@ -94,6 +95,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Connections />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <Search />
             </ProtectedRoute>
           }
         />

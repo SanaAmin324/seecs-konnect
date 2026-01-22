@@ -1,12 +1,27 @@
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
-const DraftsMenu = ({ onLoadDraft }) => {
+const DraftsMenu = ({ onLoadDraft, onDeleteDraft }) => {
   const [open, setOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  // Get current user ID
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user?._id;
+
+  // Get only drafts for current user
   const drafts = Object.keys(localStorage)
-    .filter((k) => k.startsWith("draft-"))
-    .map((k) => JSON.parse(localStorage.getItem(k)))
+    .filter((k) => k.startsWith("draft-") && k.includes(`draft-${userId}-`))
+    .map((k) => ({ key: k, ...JSON.parse(localStorage.getItem(k)) }))
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+  const handleDelete = (e, draftKey) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this draft?")) {
+      onDeleteDraft(draftKey);
+      setRefreshKey(prev => prev + 1); // Force re-render
+    }
+  };
 
   return (
     <div className="relative">
@@ -25,21 +40,32 @@ const DraftsMenu = ({ onLoadDraft }) => {
             </p>
           ) : (
             drafts.map((draft) => (
-              <button
-                key={draft.id}
-                onClick={() => {
-                  onLoadDraft(draft);
-                  setOpen(false);
-                }}
-                className="w-full text-left p-3 text-sm hover:bg-muted border-b last:border-b-0"
+              <div
+                key={draft.key}
+                className="flex items-center gap-2 p-3 text-sm hover:bg-muted border-b last:border-b-0"
               >
-                <div className="font-medium truncate">
-                  {draft.title || "Untitled Draft"}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {new Date(draft.updatedAt).toLocaleString()}
-                </div>
-              </button>
+                <button
+                  onClick={() => {
+                    onLoadDraft(draft);
+                    setOpen(false);
+                  }}
+                  className="flex-1 text-left"
+                >
+                  <div className="font-medium truncate">
+                    {draft.textBody?.substring(0, 50) || draft.title || "Untitled Draft"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(draft.updatedAt).toLocaleString()}
+                  </div>
+                </button>
+                <button
+                  onClick={(e) => handleDelete(e, draft.key)}
+                  className="p-1 hover:bg-destructive/10 hover:text-destructive rounded transition"
+                  title="Delete draft"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             ))
           )}
         </div>

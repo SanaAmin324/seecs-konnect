@@ -6,6 +6,7 @@ import {
   FolderOpen,
   Flag,
   MessageCircle,
+  Search,
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,7 @@ import { Link } from "react-router-dom";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/dashboard" },
+  { title: "Search", icon: Search, url: "/search" },
   { title: "Resources", icon: FolderOpen, url: "/documents" },
   { title: "Forums", icon: MessageSquare, url: "/forums" },
   { title: "Messages", icon: MessageCircle, url: "/messages" },

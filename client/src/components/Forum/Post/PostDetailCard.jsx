@@ -65,11 +65,9 @@ const PostDetailCard = ({ post, onPostDeleted, onPostEdited }) => {
         />
       </div>
 
-      <h1 className="text-xl font-semibold text-card-foreground">{post.content.substring(0, 100)}...</h1>
+      <p className="text-card-foreground leading-relaxed">{getCleanContent(post.content)}</p>
 
       {post.media && post.media.length > 0 && <PostMedia media={post.media} />}
-
-      <p className="text-card-foreground leading-relaxed">{getCleanContent(post.content)}</p>
 
       {(() => {
         const linksToShow = post.links && post.links.length > 0 

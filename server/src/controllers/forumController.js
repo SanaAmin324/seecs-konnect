@@ -542,6 +542,40 @@ const getUserSavedPosts = asyncHandler(async (req, res) => {
   res.json(user.savedPosts || []);
 });
 
+// -----------------------------------------------------
+// SEARCH POSTS
+// -----------------------------------------------------
+const searchPosts = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q || q.trim().length === 0) {
+    return res.json([]);
+  }
+  
+  const searchTerm = q.trim();
+  
+  // Search in post content (case-insensitive with text search)
+  const posts = await ForumPost.find({
+    content: { $regex: searchTerm, $options: 'i' }
+  })
+  .populate("user", "name username profilePicture")
+  .populate({
+    path: "comments",
+    populate: { path: "user", select: "name username profilePicture" }
+  })
+  .sort({ createdAt: -1 })
+  .limit(50);
+  
+  // Add commentCount to each post
+  const postsWithCount = posts.map(post => {
+    const postObj = post.toObject();
+    postObj.commentCount = post.comments ? post.comments.length : 0;
+    return postObj;
+  });
+  
+  res.json(postsWithCount);
+});
+
 module.exports = {
   createPost,
   getAllPosts,
@@ -560,4 +594,5 @@ module.exports = {
   getUserComments,
   toggleSavePost,
   getUserSavedPosts,
+  searchPosts,
 };

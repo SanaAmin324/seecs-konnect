@@ -122,11 +122,23 @@ const deleteDocument = asyncHandler(async (req, res) => {
 
 // Search documents
 const searchDocuments = asyncHandler(async (req, res) => {
-  const { title, course, category, className, academicYear, uploaderName, page = 1, limit = 10 } =
+  const { q, title, course, category, className, academicYear, uploaderName, page = 1, limit = 50 } =
     req.query;
 
   const query = {};
 
+  // Simple search with 'q' parameter - searches across multiple fields
+  if (q && q.trim()) {
+    const searchTerm = q.trim();
+    query.$or = [
+      { title: { $regex: searchTerm, $options: "i" } },
+      { description: { $regex: searchTerm, $options: "i" } },
+      { course: { $regex: searchTerm, $options: "i" } },
+      { category: { $regex: searchTerm, $options: "i" } },
+    ];
+  }
+
+  // Specific field searches (for advanced filtering)
   if (title) query.title = { $regex: title, $options: "i" };
   if (course) query.course = { $regex: course, $options: "i" };
   if (category) query.category = { $regex: category, $options: "i" };

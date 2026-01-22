@@ -15,7 +15,7 @@ const PostMedia = ({ media }) => {
             <video
               key={idx}
               src={mediaUrl}
-              className="w-full max-h-[500px] object-cover bg-black rounded-lg"
+              className="w-full max-h-[500px] object-contain bg-black rounded-lg"
               controls
               controlsList="nodownload"
               preload="metadata"
@@ -33,7 +33,7 @@ const PostMedia = ({ media }) => {
               key={idx}
               src={mediaUrl}
               alt="Post media"
-              className="w-full max-h-[500px] object-cover rounded-lg"
+              className="w-full max-h-[500px] object-contain rounded-lg bg-muted"
               onError={(e) => {
                 console.error("Image loading error:", e);
                 console.error("Failed to load image from:", mediaUrl);

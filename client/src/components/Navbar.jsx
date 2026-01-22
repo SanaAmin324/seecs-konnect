@@ -16,6 +16,7 @@ export default function Navbar() {
   const { logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [forumQuery, setForumQuery] = useState("");
+  const [dashboardQuery, setDashboardQuery] = useState("");
   const [forumFilter, setForumFilter] = useState("relevance");
 
   const [userName, setUserName] = useState(null);
@@ -23,6 +24,19 @@ export default function Navbar() {
   const [profilePicture, setProfilePicture] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+  const handleDashboardSearch = (e) => {
+    e.preventDefault();
+    if (dashboardQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(dashboardQuery)}&filter=all`);
+    }
+  };
+
+  const handleForumSearch = (e) => {
+    if (e.key === 'Enter' && forumQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(forumQuery)}&filter=posts`);
+    }
+  };
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -169,22 +183,24 @@ export default function Navbar() {
       <div className="flex-1 min-w-0">
         {/* DASHBOARD SEARCH */}
         {isDashboard && (
-          <div className="flex w-full max-w-2xl bg-card rounded-xl shadow-sm overflow-hidden border border-border">
+          <form onSubmit={handleDashboardSearch} className="flex w-full max-w-2xl bg-card rounded-xl shadow-sm overflow-hidden border border-border">
             <input
               type="text"
               placeholder="Search..."
+              value={dashboardQuery}
+              onChange={(e) => setDashboardQuery(e.target.value)}
               className="flex-1 px-4 py-2 bg-card focus:outline-none"
             />
 
             {/* Desktop: show quick filter buttons; Mobile: compact select */}
             <div className="hidden sm:flex">
-              <Button variant="ghost" size="sm">
+              <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/search?filter=users&q=${encodeURIComponent(dashboardQuery)}`)}>
                 Accounts
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/search?filter=posts&q=${encodeURIComponent(dashboardQuery)}`)}>
                 Forum
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/search?filter=documents&q=${encodeURIComponent(dashboardQuery)}`)}>
                 Documents
               </Button>
             </div>
@@ -195,9 +211,9 @@ export default function Navbar() {
                 className="bg-transparent border-none text-sm focus:outline-none"
                 onChange={(e) => {
                   const v = e.target.value;
-                  if (v === "Accounts") navigate("/accounts");
-                  if (v === "Forum") navigate("/forums");
-                  if (v === "Documents") navigate("/documents");
+                  if (v === "Accounts") navigate(`/search?filter=users&q=${encodeURIComponent(dashboardQuery)}`);
+                  if (v === "Forum") navigate(`/search?filter=posts&q=${encodeURIComponent(dashboardQuery)}`);
+                  if (v === "Documents") navigate(`/search?filter=documents&q=${encodeURIComponent(dashboardQuery)}`);
                 }}
               >
                 <option>Accounts</option>
@@ -206,10 +222,10 @@ export default function Navbar() {
               </select>
             </div>
 
-            <Button size="sm" className="rounded-r-xl">
+            <Button type="submit" size="sm" className="rounded-r-xl">
               Search
             </Button>
-          </div>
+          </form>
         )}
 
         {/* FORUM SEARCH (Reddit-style) */}
@@ -220,6 +236,7 @@ export default function Navbar() {
               placeholder="Search posts"
               value={forumQuery}
               onChange={(e) => setForumQuery(e.target.value)}
+              onKeyDown={handleForumSearch}
               className="flex-1 px-4 py-2 rounded-xl border bg-card focus:outline-none"
             />
 

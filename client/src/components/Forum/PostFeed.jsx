@@ -74,7 +74,7 @@ const PostFeed = ({ sortType, setSortType }) => {
       <div className="space-y-4">
         {sortedPosts.map((post) =>
           viewType === "card" ? (
-            <PostCard key={post._id} post={post} />
+            <PostCard key={post._id} post={post} viewType={viewType} />
           ) : (
             <PostCompact key={post._id} post={post} />
           )

@@ -35,8 +35,17 @@ const CreatePostForm = () => {
 
   /* -------------------- DRAFT HANDLING -------------------- */
   const handleSaveDraft = () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user?._id;
+    
+    if (!userId) {
+      alert("Please log in to save drafts");
+      return;
+    }
+
     const draft = {
       id: Date.now(),
+      userId,
       postType,
       title,
       textBody,
@@ -44,7 +53,7 @@ const CreatePostForm = () => {
       updatedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
+    localStorage.setItem(`draft-${userId}-${draft.id}`, JSON.stringify(draft));
     alert("Draft saved");
   };
 
@@ -54,6 +63,10 @@ const CreatePostForm = () => {
     setTextBody(draft.textBody || "");
     setLinkUrl(draft.linkUrl || "");
     setMediaFiles([]); // files must be re-selected
+  };
+
+  const handleDeleteDraft = (draftKey) => {
+    localStorage.removeItem(draftKey);
   };
 
   /* -------------------- SUBMIT -------------------- */
@@ -158,7 +171,7 @@ const CreatePostForm = () => {
           ← Back
         </button>
 
-        <DraftsMenu onLoadDraft={handleLoadDraft} />
+        <DraftsMenu onLoadDraft={handleLoadDraft} onDeleteDraft={handleDeleteDraft} />
       </div>
 
       {/* Tabs */}
