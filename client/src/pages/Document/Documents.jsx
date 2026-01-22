@@ -308,7 +308,12 @@ const Documents = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   {favoriteDocs.map((doc, idx) => (
-                    <Card key={doc._id} className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    <Card 
+                      key={doc._id} 
+                      className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" 
+                      style={{ animationDelay: `${idx * 0.1}s` }}
+                      onClick={() => navigate(`/documents/view/${doc._id}`)}
+                    >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
                           <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl shrink-0">📄</div>
@@ -341,7 +346,12 @@ const Documents = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   {recentlyViewed.map((doc, idx) => (
-                    <Card key={doc.id || doc._id || idx} className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    <Card 
+                      key={doc.id || doc._id || idx} 
+                      className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" 
+                      style={{ animationDelay: `${idx * 0.1}s` }}
+                      onClick={() => navigate(`/documents/view/${doc.id || doc._id}`)}
+                    >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
                           <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl shrink-0">📄</div>
@@ -372,7 +382,12 @@ const Documents = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(fetchedDocs.length ? fetchedDocs : []).map((doc, idx) => (
-                  <Card key={doc.id} className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                  <Card 
+                    key={doc.id} 
+                    className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" 
+                    style={{ animationDelay: `${idx * 0.1}s` }}
+                    onClick={() => navigate(`/documents/view/${doc.id}`)}
+                  >
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl shrink-0">{doc.thumbnail || '📄'}</div>
@@ -420,6 +435,11 @@ const Documents = () => {
                       </div>
                     </CardContent>
                     <div className="px-6 pb-6 flex gap-2">
+                      <button className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors" onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/documents/view/${doc.id}`);
+                      }}>View</button>
+                      
                       <button 
                         className={`px-3 py-1 rounded flex items-center gap-1 transition-colors ${
                           favorites.has(doc.id) 
@@ -427,6 +447,7 @@ const Documents = () => {
                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                         onClick={(e) => {
+                          e.stopPropagation();
                           e.preventDefault();
                           toggleFavorite(doc.id);
                         }}
@@ -439,6 +460,7 @@ const Documents = () => {
                       </button>
 
                       <button className="px-3 py-1 rounded bg-primary text-white" onClick={async (e) => {
+                        e.stopPropagation();
                         e.preventDefault();
                         try {
                           const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -452,6 +474,7 @@ const Documents = () => {
                       }}>Download</button>
 
                       <button className="px-3 py-1 rounded bg-red-600 text-white" onClick={async (e) => {
+                        e.stopPropagation();
                         e.preventDefault();
                         if (!confirm("Delete this document?")) return;
                         try {

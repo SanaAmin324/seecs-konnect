@@ -1,22 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 const TextEditor = ({ value, onChange }) => {
   const editorRef = useRef(null);
 
-  // Sync external value changes to the DOM
-  useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value;
-    }
-  }, [value]);
-
   const format = (command) => {
     editorRef.current?.focus();
     document.execCommand(command);
-  };
-
-  const handleInput = (e) => {
-    onChange(e.currentTarget.innerHTML);
   };
 
   return (
@@ -35,10 +24,9 @@ const TextEditor = ({ value, onChange }) => {
       <div
         ref={editorRef}
         contentEditable
-        suppressContentEditableWarning
         role="textbox"
         aria-multiline="true"
-        onInput={handleInput}
+        placeholder="Write your post..."
         className="
           min-h-[180px]
           p-3
@@ -46,10 +34,10 @@ const TextEditor = ({ value, onChange }) => {
           focus:outline-none
           prose prose-sm max-w-none
         "
-        style={{ direction: 'ltr', textAlign: 'left' }}
-      >
-        Write your post...
-      </div>
+        onInput={(e) => onChange(e.currentTarget.innerHTML)}
+        dangerouslySetInnerHTML={{ __html: value }}
+        suppressContentEditableWarning
+      />
     </div>
   );
 };
@@ -66,3 +54,4 @@ const EditorButton = ({ label, onClick }) => (
 );
 
 export default TextEditor;
+

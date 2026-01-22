@@ -6,6 +6,7 @@ const forumUpload = require("../middleware/forumUpload");
 const {
   createPost,
   getAllPosts,
+  getRecentPosts,
   getPost,
   toggleLike,
   toggleRepost,
@@ -29,6 +30,9 @@ router.post("/", protect, forumUpload.array("media", 5), createPost);
 
 // Get all posts
 router.get("/", protect, getAllPosts);
+
+// Get recent posts
+router.get("/recent", getRecentPosts);
 
 // Search posts
 router.get("/search", protect, searchPosts);

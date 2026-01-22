@@ -194,6 +194,38 @@ const searchDocuments = asyncHandler(async (req, res) => {
   });
 });
 
+// Get single document by ID
+const getDocumentById = asyncHandler(async (req, res) => {
+  try {
+    const doc = await Document.findById(req.params.id)
+      .populate("uploader", "name email username profilePicture program batch");
+    
+    if (!doc) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    res.json(doc);
+  } catch (err) {
+    console.error("Get document error:", err);
+    res.status(500).json({ message: "Failed to fetch document" });
+  }
+});
+
+// Get recent documents
+const getRecentDocuments = asyncHandler(async (req, res) => {
+  try {
+    const documents = await Document.find()
+      .populate("uploader", "name email username profilePicture program batch")
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    res.json(documents);
+  } catch (err) {
+    console.error("Get recent documents error:", err);
+    res.status(500).json({ message: "Failed to fetch recent documents" });
+  }
+});
+
 // Toggle favorite document
 const toggleFavoriteDocument = asyncHandler(async (req, res) => {
   try {
@@ -262,6 +294,8 @@ const getFavoriteDocuments = asyncHandler(async (req, res) => {
 module.exports = {
   uploadDocument,
   getDocuments,
+  getDocumentById,
+  getRecentDocuments,
   downloadDocument,
   deleteDocument,
   searchDocuments,

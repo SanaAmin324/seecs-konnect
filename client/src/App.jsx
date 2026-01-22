@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 /* Documents */
 import Documents from "./pages/Document/Documents";
+import DocumentViewer from "./pages/Document/DocumentViewer";
 import { DocumentUploadProvider } from "@/context/DocumentUploadContext";
 import UploadDocument from "@/pages/Document/UploadDocument";
 import DocumentInfo from "@/pages/Document/DocumentInfo";
@@ -145,6 +146,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Documents />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/documents/view/:id"
+          element={
+            <ProtectedRoute>
+              <DocumentViewer />
             </ProtectedRoute>
           }
         />

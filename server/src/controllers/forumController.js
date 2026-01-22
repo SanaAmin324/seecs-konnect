@@ -95,6 +95,28 @@ const getAllPosts = asyncHandler(async (req, res) => {
   res.json(posts);
 });
 
+// Get recent posts for dashboard
+const getRecentPosts = asyncHandler(async (req, res) => {
+  try {
+    const posts = await ForumPost.find()
+      .populate("author", "name username profilePicture program batch")
+      .populate("user", "name username profilePicture program batch")
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    // Map to ensure consistent data structure
+    const mappedPosts = posts.map(post => ({
+      ...post.toObject(),
+      author: post.author || post.user // Ensure author field exists
+    }));
+
+    res.json(mappedPosts);
+  } catch (err) {
+    console.error("Get recent posts error:", err);
+    res.status(500).json({ message: "Failed to fetch recent posts" });
+  }
+});
+
 // -----------------------------------------------------
 // LIKE / UNLIKE POST
 // -----------------------------------------------------
@@ -579,6 +601,7 @@ const searchPosts = asyncHandler(async (req, res) => {
 module.exports = {
   createPost,
   getAllPosts,
+  getRecentPosts,
   getPost,
   toggleLike,
   toggleRepost,
