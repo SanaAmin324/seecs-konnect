@@ -16,7 +16,14 @@ export default function UploadDocument() {
       file,
       title: file.name, // Default title
     }));
-    setFiles((prev) => [...prev, ...newFiles]);
+    setFiles((prev) => {
+      const combined = [...prev, ...newFiles];
+      if (combined.length > 3) {
+        alert("You can upload a maximum of 3 files per document.");
+        return combined.slice(0, 3);
+      }
+      return combined;
+    });
   };
 
   // Delete a file
@@ -72,7 +79,7 @@ export default function UploadDocument() {
       {/* Selected files */}
       {files.length > 0 && (
         <div className="max-w-xl mx-auto mt-6 bg-white p-5 rounded-xl shadow">
-          <h2 className="text-xl font-semibold mb-4">Files Selected</h2>
+          <h2 className="text-xl font-semibold mb-4">Files Selected (max 3)</h2>
           {files.map((f, i) => (
             <div
               key={i}

@@ -23,14 +23,25 @@ export default function DocumentReview() {
       const token = user?.token;
 
       const form = new FormData();
-      const title = data.files?.[0]?.title || data.title || "Untitled";
-      form.append("title", title);
-      form.append("description", data.description || "");
-      form.append("course", data.course || "");
-      form.append("class", data.className || "");
-      form.append("academicYear", data.academicYear || "");
-      form.append("category", data.category || "");
-
+      // Send all document metadata as a JSON string
+      const docsMeta = data.files.map(f => ({
+        title: f.title,
+        description: f.description,
+        course: f.course,
+        academicYear: f.academicYear,
+        category: f.category
+      }));
+      form.append("documents", JSON.stringify(docsMeta));
+      // Explicitly append top-level fields for backend compatibility (first document)
+      if (data.files && data.files.length > 0) {
+        const first = data.files[0];
+        form.append("title", first.title || "");
+        form.append("description", first.description || "");
+        form.append("course", first.course || "");
+        form.append("academicYear", first.academicYear || "");
+        form.append("category", first.category || "");
+      }
+      // Attach all files
       if (data.files && Array.isArray(data.files)) {
         data.files.forEach((f) => {
           if (f?.file) form.append("files", f.file);
@@ -73,22 +84,23 @@ export default function DocumentReview() {
 
       <h1 className="text-2xl font-bold mb-4">Review & Submit</h1>
 
+
       <div className="max-w-xl mx-auto space-y-4 bg-white p-5 rounded-xl shadow">
         <h2 className="text-lg font-semibold">Files</h2>
         {data.files?.map((f, i) => (
-          <div key={i} className="flex justify-between items-center border p-2 rounded">
-            <span>{f.title}</span>
-            <span className="text-muted-foreground text-sm">{f.file?.type}</span>
+          <div key={i} className="border p-4 rounded mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-semibold">Document {i + 1}: {f.title}</span>
+              <span className="text-muted-foreground text-sm">{f.file?.type}</span>
+            </div>
+            <div className="ml-2">
+              <p><strong>Course:</strong> {f.course}</p>
+              <p><strong>Academic Year:</strong> {f.academicYear}</p>
+              <p><strong>Category:</strong> {f.category}</p>
+              <p><strong>Description:</strong> {f.description}</p>
+            </div>
           </div>
         ))}
-
-        <div>
-          <p><strong>Course:</strong> {data.course}</p>
-          <p><strong>Class:</strong> {data.className}</p>
-          <p><strong>Academic Year:</strong> {data.academicYear}</p>
-          <p><strong>Category:</strong> {data.category}</p>
-          <p><strong>Description:</strong> {data.description}</p>
-        </div>
 
         {notification && (
           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">

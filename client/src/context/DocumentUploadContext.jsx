@@ -10,7 +10,6 @@ export const DocumentUploadProvider = ({ children }) => {
   const [data, setData] = useState({
     files: [],
     course: "",
-    className: "",
     academicYear: "",
     category: "",
     description: "",

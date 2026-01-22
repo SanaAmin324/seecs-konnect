@@ -14,7 +14,6 @@ import Documents from "./pages/Document/Documents";
 import { DocumentUploadProvider } from "@/context/DocumentUploadContext";
 import UploadDocument from "@/pages/Document/UploadDocument";
 import DocumentInfo from "@/pages/Document/DocumentInfo";
-import DocumentCategory from "@/pages/Document/DocumentCategory";
 import DocumentReview from "@/pages/Document/DocumentReview";
 
 /* Forum */
@@ -168,15 +167,7 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/documents/category"
-          element={
-            <DocumentUploadProvider>
-              <DocumentCategory />
-            </DocumentUploadProvider>
-          }
-        />
-
+        
         <Route
           path="/documents/review"
           element={

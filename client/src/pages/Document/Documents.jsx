@@ -15,6 +15,7 @@ import { Upload, FileText, Search, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import { formatTimeAgo } from "@/lib/timeUtils";
+import { COURSE_LIST } from "@/lib/courses";
 import { useNavigate } from "react-router-dom";
 
 const Documents = () => {
@@ -22,10 +23,30 @@ const Documents = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
-  const [favorites, setFavorites] = useState(new Set());
-  
 
-  const recentUploads = [];
+  const [favorites, setFavorites] = useState(new Set());
+  const [favoriteDocs, setFavoriteDocs] = useState([]);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [courseInput, setCourseInput] = useState("");
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [showCourseOptions, setShowCourseOptions] = useState(false);
+  const [highlightedIdx, setHighlightedIdx] = useState(-1);
+
+  // Load recently viewed from localStorage
+  useEffect(() => {
+    const rv = JSON.parse(localStorage.getItem("recentlyViewedDocuments") || "[]");
+    setRecentlyViewed(rv);
+  }, []);
+
+  // Keep courseInput in sync with selectedCourse
+  useEffect(() => {
+    if (selectedCourse === "all" || !selectedCourse) {
+      setCourseInput("");
+    } else {
+      const found = COURSE_LIST.find(c => c.code === selectedCourse);
+      if (found) setCourseInput(`${found.code} - ${found.name}`);
+    }
+  }, [selectedCourse]);
 
   const [fetchedDocs, setFetchedDocs] = useState([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
@@ -95,6 +116,7 @@ const Documents = () => {
         const data = await res.json();
         const favoriteIds = new Set(data.documents.map(doc => doc._id));
         setFavorites(favoriteIds);
+        setFavoriteDocs(data.documents || []);
       }
     } catch (err) {
       console.error("Failed to fetch favorites", err);
@@ -150,20 +172,22 @@ const Documents = () => {
     }
   };
 
+
   return (
     <MainLayout>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-muted/10 to-background">
+      <div className="min-h-screen flex w-full bg-linear-to-br from-background via-muted/10 to-background">
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto px-6 py-8 max-w-7xl">
             <div className="flex items-center justify-between mb-8 animate-fade-in">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
+                <h1 className="text-4xl font-bold bg-linear-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
                   Resources Library
                 </h1>
                 <p className="text-muted-foreground">Your cozy space for study materials</p>
               </div>
             </div>
 
+            {/* Search and filter bar with autocomplete course search */}
             <Card className="card-soft mb-8 border-2 border-border/50 animate-fade-in" style={{ animationDelay: "0.1s" }}>
               <CardContent className="p-6 space-y-4">
                 <div className="relative">
@@ -171,18 +195,73 @@ const Documents = () => {
                   <Input type="search" placeholder="Search by title, course, instructor..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-12 h-12 rounded-2xl border-2 border-border/50 bg-background/50" />
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
-                  <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-                    <SelectTrigger className="w-[180px] rounded-2xl border-2 border-border/50">
-                      <SelectValue placeholder="Course" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-2xl">
-                      <SelectItem value="all">All Courses</SelectItem>
-                      <SelectItem value="cs201">CS201 - Data Structures</SelectItem>
-                      <SelectItem value="cs301">CS301 - Databases</SelectItem>
-                      <SelectItem value="cs202">CS202 - Operating Systems</SelectItem>
-                      <SelectItem value="se301">SE301 - Software Eng</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {/* Autocomplete course search */}
+                  <div className="relative w-60">
+                    <Input
+                      type="text"
+                      placeholder="Search course (type code or name)"
+                      value={courseInput}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setCourseInput(val);
+                        if (!val) {
+                          setCourseOptions([]);
+                          setShowCourseOptions(false);
+                          setSelectedCourse("all");
+                          return;
+                        }
+                        const filtered = COURSE_LIST.filter(c =>
+                          c.code.toLowerCase().includes(val.toLowerCase()) || c.name.toLowerCase().includes(val.toLowerCase())
+                        ).slice(0, 8);
+                        setCourseOptions(filtered);
+                        setShowCourseOptions(true);
+                        setHighlightedIdx(-1);
+                      }}
+                      onFocus={() => {
+                        if (courseInput) setShowCourseOptions(true);
+                      }}
+                      onBlur={() => setTimeout(() => setShowCourseOptions(false), 150)}
+                      onKeyDown={e => {
+                        if (!showCourseOptions || courseOptions.length === 0) return;
+                        if (e.key === "ArrowDown") {
+                          setHighlightedIdx(idx => Math.min(idx + 1, courseOptions.length - 1));
+                        } else if (e.key === "ArrowUp") {
+                          setHighlightedIdx(idx => Math.max(idx - 1, 0));
+                        } else if (e.key === "Enter") {
+                          if (highlightedIdx >= 0 && highlightedIdx < courseOptions.length) {
+                            const opt = courseOptions[highlightedIdx];
+                            setCourseInput(`${opt.code} - ${opt.name}`);
+                            setSelectedCourse(opt.code);
+                            setShowCourseOptions(false);
+                          } else if (courseOptions.length > 0) {
+                            // If user presses Enter but hasn't highlighted, pick first
+                            const opt = courseOptions[0];
+                            setCourseInput(`${opt.code} - ${opt.name}`);
+                            setSelectedCourse(opt.code);
+                            setShowCourseOptions(false);
+                          }
+                        }
+                      }}
+                      className="rounded-2xl border-2 border-border/50 bg-background/50"
+                    />
+                    {showCourseOptions && courseOptions.length > 0 && (
+                      <div className="absolute z-10 w-full bg-white border border-border rounded-xl mt-1 shadow-lg max-h-56 overflow-auto">
+                        {courseOptions.map((opt, idx) => (
+                          <div
+                            key={opt.code}
+                            className={`px-4 py-2 cursor-pointer hover:bg-accent/20 ${highlightedIdx === idx ? 'bg-accent/10' : ''}`}
+                            onMouseDown={() => {
+                              setCourseInput(`${opt.code} - ${opt.name}`);
+                              setSelectedCourse(opt.code);
+                              setShowCourseOptions(false);
+                            }}
+                          >
+                            {opt.code} - {opt.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <Select value={selectedType} onValueChange={setSelectedType}>
                     <SelectTrigger className="w-[180px] rounded-2xl border-2 border-border/50">
@@ -197,12 +276,92 @@ const Documents = () => {
                   </Select>
 
                   <div className="ml-auto flex items-center gap-2">
-                    <Button onClick={() => fetchDocuments({ title: searchQuery, course: selectedCourse !== 'all' ? selectedCourse : undefined, category: selectedType !== 'all' ? selectedType : undefined })}>Search</Button>
-                    <Button variant="ghost" onClick={() => { setSearchQuery(''); setSelectedCourse('all'); setSelectedType('all'); fetchDocuments({}); }}>Reset</Button>
+                    <Button onClick={() => {
+                      // If user typed but didn't select, pick best match
+                      let course = selectedCourse;
+                      if (courseInput && (course === "all" || !course)) {
+                        const filtered = COURSE_LIST.filter(c =>
+                          c.code.toLowerCase().includes(courseInput.toLowerCase()) || c.name.toLowerCase().includes(courseInput.toLowerCase())
+                        );
+                        if (filtered.length > 0) {
+                          course = filtered[0].code;
+                          setSelectedCourse(course);
+                          setCourseInput(`${filtered[0].code} - ${filtered[0].name}`);
+                        }
+                      }
+                      fetchDocuments({ title: searchQuery, course: course !== 'all' ? course : undefined, category: selectedType !== 'all' ? selectedType : undefined });
+                    }}>Search</Button>
+                    <Button variant="ghost" onClick={() => { setSearchQuery(''); setSelectedCourse('all'); setSelectedType('all'); setCourseInput(''); setCourseOptions([]); fetchDocuments({}); }}>Reset</Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Favourites Section */}
+            <div className="mb-10 animate-fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-6 h-6 text-red-500" />
+                <h2 className="text-2xl font-bold text-foreground">Favourites</h2>
+              </div>
+              {favoriteDocs.length === 0 ? (
+                <div className="text-muted-foreground mb-4">No favourites yet. Click the heart on any document to add it here.</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {favoriteDocs.map((doc, idx) => (
+                    <Card key={doc._id} className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl shrink-0">📄</div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-lg text-foreground hover:text-primary transition-colors mb-2">{doc.title}</h3>
+                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                              <Badge className="rounded-full bg-primary/20 text-primary-foreground border border-primary/30 text-xs">{doc.course}</Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{doc.uploader?.name || ""}</p>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {doc.createdAt ? formatTimeAgo(doc.createdAt) : "Unknown"}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Recently Viewed Section */}
+            <div className="mb-10 animate-fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <FileText className="w-6 h-6 text-accent" />
+                <h2 className="text-2xl font-bold text-foreground">Recently Viewed</h2>
+              </div>
+              {recentlyViewed.length === 0 ? (
+                <div className="text-muted-foreground mb-4">No recently viewed documents yet.</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {recentlyViewed.map((doc, idx) => (
+                    <Card key={doc.id || doc._id || idx} className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl shrink-0">📄</div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-lg text-foreground hover:text-primary transition-colors mb-2">{doc.title}</h3>
+                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                              <Badge className="rounded-full bg-primary/20 text-primary-foreground border border-primary/30 text-xs">{doc.course}</Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{doc.uploader?.name || ""}</p>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {doc.createdAt ? formatTimeAgo(doc.createdAt) : "Unknown"}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="mb-10 animate-fade-in">
               <div className="flex items-center gap-2 mb-4">
@@ -212,16 +371,15 @@ const Documents = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(fetchedDocs.length ? fetchedDocs : recentUploads).map((doc, idx) => (
+                {(fetchedDocs.length ? fetchedDocs : []).map((doc, idx) => (
                   <Card key={doc.id} className="card-soft hover-lift cursor-pointer border-2 border-border/50 animate-scale-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl flex-shrink-0">{doc.thumbnail || '📄'}</div>
+                        <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-accent/20 to-primary/10 flex items-center justify-center text-4xl shrink-0">{doc.thumbnail || '📄'}</div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-lg text-foreground hover:text-primary transition-colors mb-2">{doc.title}</h3>
                           <div className="flex items-center gap-2 flex-wrap mb-2">
                             <Badge className="rounded-full bg-primary/20 text-primary-foreground border border-primary/30 text-xs">{doc.course}</Badge>
-                            <Badge className="rounded-full bg-accent/20 text-accent-foreground border border-accent/30 text-xs">{doc.type}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">{doc.instructor}</p>
                           
@@ -344,11 +502,11 @@ const Documents = () => {
 
             {/* Upload Prompt Card */}
             <Card
-              className="card-soft mt-10 border-2 border-dashed border-primary/40 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 animate-fade-in"
+              className="card-soft mt-10 border-2 border-dashed border-primary/40 bg-linear-to-br from-primary/5 via-accent/5 to-secondary/5 animate-fade-in"
               style={{ animationDelay: "0.6s" }}
             >
               <CardContent className="p-12 text-center">
-                <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center animate-bounce-soft">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-linear-to-br from-primary via-accent to-secondary flex items-center justify-center animate-bounce-soft">
                   <Upload className="w-12 h-12 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-3">Share Your Knowledge</h3>
@@ -368,7 +526,7 @@ const Documents = () => {
         <Link to="/documents/upload">
           <Button
             size="lg"
-            className="fixed bottom-8 right-8 z-50 gap-2 rounded-full bg-gradient-to-r from-primary via-accent to-secondary hover:shadow-2xl text-white hover-bounce px-6 py-6 h-auto shadow-xl"
+            className="fixed bottom-8 right-8 z-50 gap-2 rounded-full bg-linear-to-r from-primary via-accent to-secondary hover:shadow-2xl text-white hover-bounce px-6 py-6 h-auto shadow-xl"
           >
             <Upload className="w-6 h-6" />
             <span className="hidden md:inline">Upload Document</span>
